@@ -63,21 +63,25 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdminLogin }) => {
           {/* Admin and system */}
           <div>
             <h4 className="font-semibold text-white uppercase tracking-wider text-xs mb-3">
-              Administración
+              Administración y Estado
             </h4>
             <div className="space-y-2.5">
+              <button
+                onClick={() => {
+                  handleResetCatalog();
+                }}
+                className="flex items-center gap-1.5 text-slate-400 hover:text-blue-400 transition-colors text-xs"
+                title="Sincronizar y actualizar a la última versión del catálogo"
+              >
+                <RefreshCw className="w-3.5 h-3.5 text-blue-400" />
+                <span>Sincronizar catálogo (181 juegos a $5.900)</span>
+              </button>
+
               {isAdmin ? (
-                <div className="space-y-2">
+                <div className="space-y-2 pt-1 border-t border-slate-800/80">
                   <span className="text-emerald-400 font-medium block">
                     ✓ Modo Administrador Habilitado
                   </span>
-                  <button
-                    onClick={handleResetCatalog}
-                    className="flex items-center gap-1.5 text-slate-400 hover:text-amber-400 transition-colors text-xs"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Restablecer catálogo inicial</span>
-                  </button>
                   <button
                     onClick={logoutAdmin}
                     className="flex items-center gap-1.5 text-slate-400 hover:text-rose-400 transition-colors text-xs"

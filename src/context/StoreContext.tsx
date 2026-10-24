@@ -8,6 +8,7 @@ interface StoreContextType {
   updateGame: (id: string, updatedData: Partial<Game>) => void;
   deleteGame: (id: string) => void;
   resetCatalog: () => void;
+  syncCatalog: () => void;
   isAdmin: boolean;
   loginAdmin: (user: string, pass: string) => { success: boolean; error?: string };
   logoutAdmin: () => void;
@@ -26,27 +27,80 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-const STORAGE_KEY_GAMES = 'total_game_catalog_v6';
-const STORAGE_KEY_CART = 'total_game_cart_v1';
+// Updated version key to force all browsers to discard old localStorage states
+const STORAGE_KEY_GAMES = 'total_game_catalog_ps3_v8_fixed';
+const STORAGE_KEY_CART = 'total_game_cart_v2';
 const STORAGE_KEY_ADMIN = 'total_game_admin_auth_v1';
+
+// Legacy keys to purge automatically from user browsers
+const LEGACY_KEYS = [
+  'total_game_catalog_v1',
+  'total_game_catalog_v2',
+  'total_game_catalog_v3',
+  'total_game_catalog_v4',
+  'total_game_catalog_v5',
+  'total_game_catalog_v6',
+  'total_game_catalog_v7',
+  'total_game_cart_v1',
+];
+
+const purgeLegacyStorage = () => {
+  try {
+    LEGACY_KEYS.forEach((key) => localStorage.removeItem(key));
+    // Also remove any old keys that start with total_game_catalog_ but aren't current
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('total_game_catalog_') && k !== STORAGE_KEY_GAMES) {
+        localStorage.removeItem(k);
+      }
+    }
+  } catch {
+    // Ignore storage errors in restricted contexts
+  }
+};
 
 // Hardcoded admin credentials
 export const ADMIN_USERNAME = 'yako';
 export const ADMIN_PASSWORD = 'yako';
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Games state
+  // Games state with auto-migration and stale data detection
   const [games, setGames] = useState<Game[]>(() => {
     try {
+      purgeLegacyStorage();
       const saved = localStorage.getItem(STORAGE_KEY_GAMES);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          // If ANY game has old 4900 price or old 'Primaria'/'Secundaria' conditions,
+          // purge and immediately load clean INITIAL_GAMES
+          const hasOldData = parsed.some(
+            (g: any) =>
+              g.price === 4900 ||
+              (typeof g.condition === 'string' &&
+                (g.condition.toLowerCase().includes('primaria') ||
+                  g.condition.toLowerCase().includes('secundaria')))
+          );
+
+          if (hasOldData) {
+            localStorage.removeItem(STORAGE_KEY_GAMES);
+            return INITIAL_GAMES;
+          }
+
+          // Otherwise sanitize and return
+          return parsed.map((g: Game) => ({
+            ...g,
+            price: g.price === 4900 ? 5900 : (g.price || 5900),
+            condition:
+              g.condition === ('Digital Primaria' as any) ||
+              g.condition === ('Digital Secundaria' as any)
+                ? 'Digital PS3'
+                : (g.condition || 'Digital PS3'),
+          }));
         }
       }
     } catch {
-      // fallback
+      // fallback to initial
     }
     return INITIAL_GAMES;
   });
@@ -64,12 +118,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Cart state: Renews fresh every time user enters the page
   const [cart, setCart] = useState<CartItem[]>([]);
-
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Clear any existing stored cart on mount so every visit starts clean
+  // Clear any legacy cart or stale cart on mount
   useEffect(() => {
     try {
+      purgeLegacyStorage();
       localStorage.removeItem(STORAGE_KEY_CART);
     } catch {
       // ignore
@@ -111,12 +165,19 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const deleteGame = (id: string) => {
     setGames((prev) => prev.filter((g) => g.id !== id));
-    // Also remove from cart if present
     setCart((prev) => prev.filter((item) => item.game.id !== id));
   };
 
   const resetCatalog = () => {
+    try {
+      localStorage.removeItem(STORAGE_KEY_GAMES);
+      purgeLegacyStorage();
+    } catch {}
     setGames(INITIAL_GAMES);
+  };
+
+  const syncCatalog = () => {
+    resetCatalog();
   };
 
   const loginAdmin = (user: string, pass: string) => {
@@ -186,6 +247,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateGame,
         deleteGame,
         resetCatalog,
+        syncCatalog,
         isAdmin,
         loginAdmin,
         logoutAdmin,

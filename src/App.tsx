@@ -9,10 +9,10 @@ import { AdminLoginModal } from './components/AdminLoginModal';
 import { GameFormModal } from './components/GameFormModal';
 import { Footer } from './components/Footer';
 import { Game } from './types/game';
-import { Search, Plus, Filter, Sparkles, Lock, ShoppingCart } from 'lucide-react';
+import { Search, Plus, Filter, Sparkles, Lock, ShoppingCart, RefreshCw } from 'lucide-react';
 
 const CatalogContent: React.FC = () => {
-  const { games, isAdmin, lastAddedGame, clearLastAddedGame, setIsCartOpen, cartCount } = useStore();
+  const { games, isAdmin, lastAddedGame, clearLastAddedGame, setIsCartOpen, cartCount, resetCatalog } = useStore();
 
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState('');
@@ -118,13 +118,27 @@ const CatalogContent: React.FC = () => {
                 Puedes agregar nuevos juegos al catálogo con imagen, descripción y precio, o modificar los existentes. Los visitantes únicamente podrán explorar y comprar por WhatsApp.
               </p>
             </div>
-            <button
-              onClick={handleOpenCreate}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-md transition-all active:scale-95 shrink-0 flex items-center gap-1.5"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Agregar Nuevo Juego</span>
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => {
+                  if (confirm('¿Restablecer el catálogo a los 181 juegos oficiales ($5.900 c/u)?')) {
+                    resetCatalog();
+                  }
+                }}
+                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold rounded-lg border border-slate-700 transition-all flex items-center gap-1.5"
+                title="Restablece la lista a los 181 juegos oficiales"
+              >
+                <RefreshCw className="w-3.5 h-3.5 text-blue-400" />
+                <span>Restablecer Catálogo (181)</span>
+              </button>
+              <button
+                onClick={handleOpenCreate}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Agregar Nuevo Juego</span>
+              </button>
+            </div>
           </div>
         )}
 
