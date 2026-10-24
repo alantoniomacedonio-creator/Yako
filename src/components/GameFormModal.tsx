@@ -2,25 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { X, Upload, Image as ImageIcon, Save, Check, Plus } from 'lucide-react';
 import { Game, Platform, GameCondition } from '../types/game';
 import { useStore } from '../context/StoreContext';
-import spidermanImg from '../assets/images/game_spiderman2_1792844748790.jpg';
-import godofwarImg from '../assets/images/game_godofwar_1792844749214.jpg';
-import lastofusImg from '../assets/images/game_lastofus_1792844749597.jpg';
-import granturismoImg from '../assets/images/game_granturismo_1792844749613.jpg';
-import ps3UnchartedImg from '../assets/images/game_ps3_uncharted_1792845342338.jpg';
-
 interface GameFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   gameToEdit?: Game | null;
 }
-
-const PRESET_COVERS = [
-  { name: 'Spider-Man 2', url: spidermanImg },
-  { name: 'God of War', url: godofwarImg },
-  { name: 'The Last of Us', url: lastofusImg },
-  { name: 'Gran Turismo 7', url: granturismoImg },
-  { name: 'Uncharted PS3', url: ps3UnchartedImg },
-];
 
 export const GameFormModal: React.FC<GameFormModalProps> = ({
   isOpen,
@@ -32,14 +18,14 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
   const [title, setTitle] = useState('');
   const [platform, setPlatform] = useState<Platform>('PS5');
   const [genre, setGenre] = useState('Acción / Aventura');
-  const [condition, setCondition] = useState<GameCondition>('Nuevo Físico');
-  const [price, setPrice] = useState<number>(55000);
+  const [condition, setCondition] = useState<GameCondition>('Digital PS3');
+  const [price, setPrice] = useState<number>(5900);
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [inStock, setInStock] = useState(true);
   const [featured, setFeatured] = useState(false);
   const [languages, setLanguages] = useState('Español Latino, Inglés');
-  const [releaseYear, setReleaseYear] = useState<number>(2024);
+  const [releaseYear, setReleaseYear] = useState<number>(2013);
 
   useEffect(() => {
     if (gameToEdit) {
@@ -53,20 +39,20 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
       setInStock(gameToEdit.inStock);
       setFeatured(!!gameToEdit.featured);
       setLanguages(gameToEdit.languages || 'Español Latino, Inglés');
-      setReleaseYear(gameToEdit.releaseYear || 2024);
+      setReleaseYear(gameToEdit.releaseYear || 2013);
     } else {
       // Defaults for new game
       setTitle('');
-      setPlatform('PS5');
+      setPlatform('PS3');
       setGenre('Acción / Aventura');
-      setCondition('Nuevo Físico');
-      setPrice(59900);
+      setCondition('Digital PS3');
+      setPrice(5900);
       setDescription('');
-      setImageUrl(spidermanImg);
+      setImageUrl('');
       setInStock(true);
       setFeatured(false);
       setLanguages('Español Latino, Inglés');
-      setReleaseYear(2024);
+      setReleaseYear(2013);
     }
   }, [gameToEdit, isOpen]);
 
@@ -98,13 +84,13 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
       platform,
       genre,
       condition,
-      price: Number(price) || 0,
+      price: Number(price) || 5900,
       description: description.trim() || 'Juego original para PlayStation en excelente estado.',
-      imageUrl: imageUrl || spidermanImg,
+      imageUrl: imageUrl.trim(),
       inStock,
       featured,
       languages,
-      releaseYear: Number(releaseYear) || 2024,
+      releaseYear: Number(releaseYear) || 2013,
     };
 
     if (gameToEdit) {
@@ -214,10 +200,9 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
                 onChange={(e) => setCondition(e.target.value as GameCondition)}
                 className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
               >
-                <option value="Nuevo Físico">Nuevo Físico (Caja sellada)</option>
-                <option value="Digital Primaria">Digital Primaria</option>
-                <option value="Digital Secundaria">Digital Secundaria</option>
-                <option value="Físico Seminuevo">Físico Seminuevo (Impecable)</option>
+                <option value="Digital PS3">Digital PS3</option>
+                <option value="Digital">Digital</option>
+                <option value="Físico">Físico</option>
               </select>
             </div>
 
@@ -279,25 +264,7 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
                     className="hidden"
                   />
                 </label>
-
-                <span className="text-[11px] text-slate-500">o elegir portada rápida:</span>
-
-                <div className="flex items-center gap-1.5">
-                  {PRESET_COVERS.map((preset) => (
-                    <button
-                      key={preset.name}
-                      type="button"
-                      onClick={() => setImageUrl(preset.url)}
-                      className={`text-[11px] px-2 py-1 rounded border transition-colors ${
-                        imageUrl === preset.url
-                          ? 'border-blue-500 bg-blue-950 text-blue-300 font-semibold'
-                          : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      {preset.name}
-                    </button>
-                  ))}
-                </div>
+                <span className="text-[11px] text-slate-500">Formatos recomendados: WebP, JPG, PNG</span>
               </div>
 
               {/* Preview */}

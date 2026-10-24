@@ -11,6 +11,7 @@ interface GameDetailModalProps {
 
 export const GameDetailModal: React.FC<GameDetailModalProps> = ({ game, onClose }) => {
   const { addToCart } = useStore();
+  const [imgError, setImgError] = useState(false);
 
   if (!game) return null;
 
@@ -42,12 +43,40 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({ game, onClose 
             
             {/* Cover Column */}
             <div className="md:col-span-5 relative aspect-[3/4] rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shadow-md">
-              <img
-                src={game.imageUrl}
-                alt={game.title}
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-              />
+              {game.imageUrl && !imgError ? (
+                <img
+                  src={game.imageUrl}
+                  alt={game.title}
+                  onError={() => setImgError(true)}
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col justify-between bg-gradient-to-b from-slate-900 via-slate-900 to-blue-950/80 p-5 select-none">
+                  <div className="flex items-center justify-between opacity-80">
+                    <span className="text-[10px] font-black tracking-widest text-blue-400">PLAYSTATION</span>
+                    <div className="flex items-center gap-1 text-[10px] font-bold">
+                      <span className="text-emerald-400">△</span>
+                      <span className="text-rose-400">◯</span>
+                      <span className="text-blue-400">✕</span>
+                      <span className="text-purple-400">□</span>
+                    </div>
+                  </div>
+                  <div className="text-center my-auto px-2">
+                    <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                      <Gamepad2 className="w-7 h-7" />
+                    </div>
+                    <h3 className="text-base font-bold text-white leading-tight">
+                      {game.title}
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-1">{game.genre}</p>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-2">
+                    <span className="font-bold text-blue-300">{game.platform}</span>
+                    <span className="text-slate-500">{game.releaseYear || 'PS3'}</span>
+                  </div>
+                </div>
+              )}
               <div className="absolute top-3 left-3 flex flex-col gap-1.5">
                 <span className={`text-xs font-bold px-2.5 py-1 rounded tracking-wider shadow ${
                   game.platform.includes('PS3') ? 'bg-red-700 text-white' : 'bg-blue-600 text-white'

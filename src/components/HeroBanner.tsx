@@ -1,6 +1,5 @@
 import React from 'react';
-import { ArrowDown, Sparkles, CheckCircle2 } from 'lucide-react';
-import heroImg from '../assets/images/hero_total_game_ps5_1792844747027.jpg';
+import { ArrowDown, Sparkles, CheckCircle2, Gamepad2 } from 'lucide-react';
 
 interface HeroBannerProps {
   onSelectPlatform?: (platform: string) => void;
@@ -37,16 +36,16 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onSelectPlatform }) => {
             </h1>
 
             <p className="text-base sm:text-lg text-slate-300 max-w-xl leading-relaxed">
-              Explorá nuestro catálogo de PS5, PS4 y clásicos de PS3 en formato físico y digital. Armá tu carrito y finalizá tu pedido directamente por WhatsApp con atención personalizada.
+              Explorá nuestro catálogo completo de juegos PlayStation a solo $5.900 cada uno. Armá tu carrito y coordiná tu pedido directo por WhatsApp con entrega digital rápida.
             </p>
 
             {/* Direct Action */}
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <a
                 href="#catalogo"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all shadow-lg shadow-blue-600/30 active:scale-95"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all shadow-lg shadow-blue-600/30 active:scale-95 cursor-pointer"
               >
-                <span>Explorar Catálogo</span>
+                <span>Explorar Catálogo (+180 Juegos)</span>
                 <ArrowDown className="w-4 h-4" />
               </a>
             </div>
@@ -114,7 +113,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onSelectPlatform }) => {
                     PlayStation 3
                   </span>
                   <span className="text-[10px] text-slate-400 block mt-0.5">
-                    Joyas Retro
+                    Catálogo Completo
                   </span>
                 </button>
 
@@ -129,43 +128,77 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onSelectPlatform }) => {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
-                <span>Entrega y soporte rápido</span>
+                <span>Entrega inmediata</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
-                <span>Pago seguro y transparente</span>
+                <span>Precio único: $5.900</span>
               </div>
             </div>
           </div>
 
-          {/* Right Column: PS5 Console Visual Showcase */}
+          {/* Right Column: High-tech PlayStation Card Showcase */}
           <div className="lg:col-span-5 relative">
-            <div className="relative rounded-2xl overflow-hidden border border-blue-900/40 bg-slate-900/50 shadow-2xl shadow-blue-950/60 aspect-[16/10] sm:aspect-[16/10] lg:aspect-auto lg:h-[400px]">
-              <img
-                src={heroImg}
-                alt="Consola PlayStation 5 y DualSense en Total Game"
-                className="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-700"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#070b14] via-transparent to-transparent opacity-60" />
+            <div className="relative rounded-2xl overflow-hidden border border-blue-900/50 bg-gradient-to-b from-slate-900 via-[#0a1124] to-[#070b14] shadow-2xl shadow-blue-950/80 p-6 flex flex-col justify-between min-h-[360px]">
               
-              {/* Floating PlayStation badges on visual */}
-              <div className="absolute top-4 left-4 flex gap-2">
-                <span className="px-2.5 py-1 rounded bg-sky-500 text-slate-950 font-black text-xs shadow-md">
-                  PS5
-                </span>
-                <span className="px-2.5 py-1 rounded bg-blue-600 text-white font-black text-xs shadow-md">
-                  PS4
-                </span>
-                <span className="px-2.5 py-1 rounded bg-red-600 text-white font-black text-xs shadow-md">
-                  PS3
+              {/* Geometric PlayStation symbols watermark */}
+              <div className="absolute -right-8 -top-8 text-blue-600/10 text-9xl font-mono select-none pointer-events-none">
+                ▲●✖■
+              </div>
+
+              {/* Header inside card */}
+              <div className="flex items-center justify-between z-10">
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/40">
+                    <Gamepad2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="font-display font-black text-white text-base tracking-wider block">
+                      TOTAL GAME
+                    </span>
+                    <span className="text-[11px] text-blue-400 font-mono">Edición PlayStation</span>
+                  </div>
+                </div>
+
+                <span className="text-xs font-black px-2.5 py-1 rounded bg-red-600 text-white shadow">
+                  PS3 STORE
                 </span>
               </div>
 
-              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-slate-300 bg-slate-950/85 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-slate-800">
-                <span className="font-semibold text-white">Catálogo Total Game</span>
-                <span className="text-blue-400 font-mono font-medium">PS5 · PS4 · PS3</span>
+              {/* Middle Showcase: Price Tag & Catalog Summary */}
+              <div className="py-8 z-10 space-y-3">
+                <div className="inline-block px-3 py-1 bg-blue-950/80 border border-blue-800/60 rounded-full text-xs font-semibold text-blue-300">
+                  ⚡ Todos los juegos al mismo precio
+                </div>
+
+                <div className="flex items-baseline gap-2">
+                  <span className="text-4xl sm:text-5xl font-black text-white tracking-tight tabular-nums">
+                    $ 5.900
+                  </span>
+                  <span className="text-xs text-slate-400">ARS / unidad</span>
+                </div>
+
+                <p className="text-xs text-slate-300 leading-relaxed max-w-sm">
+                  Grand Theft Auto, The Last of Us, Call of Duty, FIFA, Mortal Kombat, Resident Evil, sagas LEGO y más de 180 clásicos.
+                </p>
               </div>
+
+              {/* Bottom stats inside card */}
+              <div className="pt-4 border-t border-slate-800/80 grid grid-cols-3 gap-2 text-center z-10">
+                <div className="p-2 bg-slate-950/60 rounded-lg border border-slate-800">
+                  <span className="text-base font-bold text-white block tabular-nums">+180</span>
+                  <span className="text-[10px] text-slate-400">Juegos</span>
+                </div>
+                <div className="p-2 bg-slate-950/60 rounded-lg border border-slate-800">
+                  <span className="text-base font-bold text-blue-400 block">100%</span>
+                  <span className="text-[10px] text-slate-400">Digital</span>
+                </div>
+                <div className="p-2 bg-slate-950/60 rounded-lg border border-slate-800">
+                  <span className="text-base font-bold text-emerald-400 block">WhatsApp</span>
+                  <span className="text-[10px] text-slate-400">Directo</span>
+                </div>
+              </div>
+
             </div>
           </div>
 

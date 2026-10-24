@@ -1,6 +1,6 @@
 export type Platform = 'PS5' | 'PS4' | 'PS3' | 'PS5 / PS4' | 'PS4 / PS3';
 
-export type GameCondition = 'Nuevo Físico' | 'Digital Primaria' | 'Digital Secundaria' | 'Físico Seminuevo';
+export type GameCondition = 'Digital PS3' | 'Digital' | 'Físico';
 
 export type GameGenre = 
   | 'Acción / Aventura'

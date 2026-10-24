@@ -26,13 +26,13 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-const STORAGE_KEY_GAMES = 'total_game_catalog_v2';
+const STORAGE_KEY_GAMES = 'total_game_catalog_v6';
 const STORAGE_KEY_CART = 'total_game_cart_v1';
 const STORAGE_KEY_ADMIN = 'total_game_admin_auth_v1';
 
 // Hardcoded admin credentials
-export const ADMIN_USERNAME = 'jako';
-export const ADMIN_PASSWORD = 'jako';
+export const ADMIN_USERNAME = 'yako';
+export const ADMIN_PASSWORD = 'yako';
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Games state

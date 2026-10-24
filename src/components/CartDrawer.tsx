@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, Plus, Minus, MessageCircle, ShoppingCart, ArrowRight, Copy, Check, ArrowLeft } from 'lucide-react';
+import { X, Trash2, Plus, Minus, MessageCircle, ShoppingCart, ArrowRight, Copy, Check, ArrowLeft, Gamepad2 } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { formatPrice, generateWhatsAppOrderUrl, OrderCustomerInfo, WHATSAPP_DISPLAY_PHONE } from '../utils/whatsapp';
 
@@ -7,7 +7,7 @@ export const CartDrawer: React.FC = () => {
   const { cart, removeFromCart, updateQuantity, clearCart, isCartOpen, setIsCartOpen, cartTotal, cartCount } = useStore();
   
   const [customerName, setCustomerName] = useState('');
-  const [deliveryMethod, setDeliveryMethod] = useState<'Envío a domicilio' | 'Retiro en sucursal' | 'Envío digital (código/cuenta)'>('Envío digital (código/cuenta)');
+  const [deliveryMethod, setDeliveryMethod] = useState<'Envío digital (descarga directa)' | 'Envío a domicilio' | 'Retiro en sucursal'>('Envío digital (descarga directa)');
   const [notes, setNotes] = useState('');
   const [copied, setCopied] = useState(false);
 
@@ -135,15 +135,23 @@ export const CartDrawer: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleReturnToCatalog}
-                      className="w-12 h-16 sm:w-14 sm:h-18 rounded-lg overflow-hidden bg-slate-950 shrink-0 border border-slate-800 hover:scale-105 transition-transform cursor-pointer"
+                      className="w-12 h-16 sm:w-14 sm:h-18 rounded-lg overflow-hidden bg-slate-950 shrink-0 border border-slate-800 hover:scale-105 transition-transform cursor-pointer flex flex-col items-center justify-center p-1 text-center"
                       title="Hacer clic para volver al catálogo y ver más juegos"
                     >
-                      <img
-                        src={item.game.imageUrl}
-                        alt={item.game.title}
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                      />
+                      {item.game.imageUrl ? (
+                        <img
+                          src={item.game.imageUrl}
+                          alt={item.game.title}
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-between py-1 bg-gradient-to-b from-slate-900 to-blue-950/70">
+                          <span className="text-[8px] font-black text-blue-400">{item.game.platform}</span>
+                          <Gamepad2 className="w-4 h-4 text-blue-500/70" />
+                          <span className="text-[7px] text-slate-400 line-clamp-1 max-w-[42px] leading-tight font-medium">{item.game.title}</span>
+                        </div>
+                      )}
                     </button>
 
                     {/* Info */}
@@ -233,7 +241,7 @@ export const CartDrawer: React.FC = () => {
                     onChange={(e) => setDeliveryMethod(e.target.value as any)}
                     className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500"
                   >
-                    <option value="Envío digital (código/cuenta)">Envío digital (inmediato)</option>
+                    <option value="Envío digital (descarga directa)">Envío digital PS3 (descarga directa)</option>
                     <option value="Envío a domicilio">Envío a domicilio</option>
                     <option value="Retiro en sucursal">Retiro en persona</option>
                   </select>

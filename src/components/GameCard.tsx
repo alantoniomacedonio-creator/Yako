@@ -84,9 +84,34 @@ export const GameCard: React.FC<GameCardProps> = ({
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-blue-950/60 text-slate-500 p-4 text-center">
-            <Gamepad2 className="w-12 h-12 text-blue-500/50 mb-2" />
-            <span className="text-xs font-semibold text-slate-400">{game.title}</span>
+          <div className="w-full h-full flex flex-col justify-between bg-gradient-to-b from-slate-900 via-slate-900 to-blue-950/70 p-3.5 relative select-none">
+            {/* Top PlayStation spine branding */}
+            <div className="flex items-center justify-between opacity-80 pt-0.5">
+              <span className="text-[9px] font-black tracking-widest text-blue-400">PLAYSTATION</span>
+              <div className="flex items-center gap-1 text-[9px] font-bold">
+                <span className="text-emerald-400">△</span>
+                <span className="text-rose-400">◯</span>
+                <span className="text-blue-400">✕</span>
+                <span className="text-purple-400">□</span>
+              </div>
+            </div>
+
+            {/* Middle Title badge */}
+            <div className="my-auto text-center px-1">
+              <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 group-hover:text-blue-300 transition-all">
+                <Gamepad2 className="w-5 h-5" />
+              </div>
+              <h4 className="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-tight">
+                {game.title}
+              </h4>
+              <p className="text-[10px] text-slate-400 mt-1 line-clamp-1">{game.genre}</p>
+            </div>
+
+            {/* Bottom details */}
+            <div className="flex items-center justify-between text-[10px] text-slate-400 border-t border-slate-800/80 pt-1.5">
+              <span className="font-bold text-blue-300">{game.platform}</span>
+              <span className="text-slate-500">{game.releaseYear || 'PS3'}</span>
+            </div>
           </div>
         )}
 
@@ -112,29 +137,29 @@ export const GameCard: React.FC<GameCardProps> = ({
       </div>
 
       {/* Card Content & Metadata */}
-      <div className="p-4 flex flex-col flex-1 justify-between gap-3">
+      <div className="p-2.5 sm:p-4 flex flex-col flex-1 justify-between gap-2 sm:gap-3">
         <div>
-          {/* Unboxed Metadata discipline */}
-          <div className="flex items-center gap-2 text-xs text-slate-400 mb-1.5 truncate">
+          {/* Metadata */}
+          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-400 mb-1 truncate">
             <span className="truncate">{game.genre}</span>
             <span aria-hidden="true" className="text-slate-600">·</span>
             <span className="text-blue-300 font-medium shrink-0">{game.condition}</span>
           </div>
 
-          <h3 className="font-semibold text-white text-base leading-snug line-clamp-2 group-hover:text-blue-400 transition-colors">
+          <h3 className="font-semibold text-white text-xs sm:text-base leading-snug line-clamp-2 group-hover:text-blue-400 transition-colors">
             {game.title}
           </h3>
 
-          <p className="mt-1 text-xs text-slate-400 line-clamp-2 leading-relaxed">
+          <p className="mt-1 text-[11px] sm:text-xs text-slate-400 line-clamp-2 leading-relaxed">
             {game.description}
           </p>
         </div>
 
         {/* Price & Add to Cart button */}
-        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2 mt-auto">
+        <div className="pt-2 border-t border-slate-800/80 flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-1.5 sm:gap-2 mt-auto">
           <div>
-            <span className="text-[11px] text-slate-400 block leading-none">Precio</span>
-            <span className="text-lg font-bold text-white tabular-nums tracking-tight">
+            <span className="text-[9px] sm:text-[11px] text-slate-400 block leading-none">Precio</span>
+            <span className="text-sm sm:text-lg font-bold text-white tabular-nums tracking-tight">
               {formatPrice(game.price)}
             </span>
           </div>
@@ -142,7 +167,7 @@ export const GameCard: React.FC<GameCardProps> = ({
           <button
             onClick={handleAddToCart}
             disabled={!game.inStock}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all active:scale-95 whitespace-nowrap cursor-pointer ${
+            className={`flex items-center justify-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-bold transition-all active:scale-95 whitespace-nowrap cursor-pointer ${
               justAdded
                 ? 'bg-emerald-600 text-white'
                 : game.inStock
@@ -154,12 +179,13 @@ export const GameCard: React.FC<GameCardProps> = ({
             {justAdded ? (
               <>
                 <Check className="w-3.5 h-3.5" />
-                <span>¡Agregado!</span>
+                <span>¡Listo!</span>
               </>
             ) : (
               <>
                 <ShoppingCart className="w-3.5 h-3.5 shrink-0" />
-                <span>Agregar al carrito</span>
+                <span className="hidden sm:inline">Agregar al carrito</span>
+                <span className="sm:hidden">Comprar</span>
               </>
             )}
           </button>

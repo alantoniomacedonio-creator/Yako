@@ -270,9 +270,9 @@ const CatalogContent: React.FC = () => {
           </div>
         </div>
 
-        {/* Product Cards Grid */}
+        {/* Product Cards Grid: 2 columns on mobile (celular), scaling up on larger screens */}
         {filteredGames.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6">
             {filteredGames.map((game) => (
               <GameCard
                 key={game.id}

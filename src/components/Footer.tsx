@@ -32,7 +32,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdminLogin }) => {
               </span>
             </div>
             <p className="text-slate-400 max-w-sm leading-relaxed text-xs">
-              Tu tienda de videojuegos de confianza. Especialistas en títulos de PlayStation 5 y PlayStation 4 en formato físico y digital con entrega rápida en toda Argentina.
+              Tu tienda de videojuegos de confianza. Especialistas en títulos de PlayStation 3, PlayStation 4 y PlayStation 5 en formato digital con entrega inmediata.
             </p>
             <div className="pt-1">
               <a
@@ -54,7 +54,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdminLogin }) => {
             </h4>
             <ul className="space-y-2">
               <li>• Compra directa y rápida sin necesidad de registrarte</li>
-              <li>• Envíos digitales inmediatos con instructivo de activación</li>
+              <li>• Envíos digitales inmediatos con instructivo de instalación</li>
               <li>• Envíos a domicilio y puntos de entrega</li>
               <li>• Medios de pago: Transferencia, Mercado Pago y Efectivo</li>
             </ul>

@@ -13,7 +13,7 @@ export function formatPrice(amount: number): string {
 
 export interface OrderCustomerInfo {
   name?: string;
-  deliveryMethod?: 'Envío a domicilio' | 'Retiro en sucursal' | 'Envío digital (código/cuenta)';
+  deliveryMethod?: 'Envío digital (descarga directa)' | 'Envío a domicilio' | 'Retiro en sucursal';
   notes?: string;
 }
 
