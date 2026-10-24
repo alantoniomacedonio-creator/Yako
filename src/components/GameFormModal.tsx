@@ -1,0 +1,364 @@
+import React, { useState, useEffect } from 'react';
+import { X, Upload, Image as ImageIcon, Save, Check, Plus } from 'lucide-react';
+import { Game, Platform, GameCondition } from '../types/game';
+import { useStore } from '../context/StoreContext';
+import spidermanImg from '../assets/images/game_spiderman2_1792844748790.jpg';
+import godofwarImg from '../assets/images/game_godofwar_1792844749214.jpg';
+import lastofusImg from '../assets/images/game_lastofus_1792844749597.jpg';
+import granturismoImg from '../assets/images/game_granturismo_1792844749613.jpg';
+import ps3UnchartedImg from '../assets/images/game_ps3_uncharted_1792845342338.jpg';
+
+interface GameFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  gameToEdit?: Game | null;
+}
+
+const PRESET_COVERS = [
+  { name: 'Spider-Man 2', url: spidermanImg },
+  { name: 'God of War', url: godofwarImg },
+  { name: 'The Last of Us', url: lastofusImg },
+  { name: 'Gran Turismo 7', url: granturismoImg },
+  { name: 'Uncharted PS3', url: ps3UnchartedImg },
+];
+
+export const GameFormModal: React.FC<GameFormModalProps> = ({
+  isOpen,
+  onClose,
+  gameToEdit,
+}) => {
+  const { addGame, updateGame } = useStore();
+
+  const [title, setTitle] = useState('');
+  const [platform, setPlatform] = useState<Platform>('PS5');
+  const [genre, setGenre] = useState('Acción / Aventura');
+  const [condition, setCondition] = useState<GameCondition>('Nuevo Físico');
+  const [price, setPrice] = useState<number>(55000);
+  const [description, setDescription] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [inStock, setInStock] = useState(true);
+  const [featured, setFeatured] = useState(false);
+  const [languages, setLanguages] = useState('Español Latino, Inglés');
+  const [releaseYear, setReleaseYear] = useState<number>(2024);
+
+  useEffect(() => {
+    if (gameToEdit) {
+      setTitle(gameToEdit.title);
+      setPlatform(gameToEdit.platform);
+      setGenre(gameToEdit.genre);
+      setCondition(gameToEdit.condition);
+      setPrice(gameToEdit.price);
+      setDescription(gameToEdit.description);
+      setImageUrl(gameToEdit.imageUrl);
+      setInStock(gameToEdit.inStock);
+      setFeatured(!!gameToEdit.featured);
+      setLanguages(gameToEdit.languages || 'Español Latino, Inglés');
+      setReleaseYear(gameToEdit.releaseYear || 2024);
+    } else {
+      // Defaults for new game
+      setTitle('');
+      setPlatform('PS5');
+      setGenre('Acción / Aventura');
+      setCondition('Nuevo Físico');
+      setPrice(59900);
+      setDescription('');
+      setImageUrl(spidermanImg);
+      setInStock(true);
+      setFeatured(false);
+      setLanguages('Español Latino, Inglés');
+      setReleaseYear(2024);
+    }
+  }, [gameToEdit, isOpen]);
+
+  if (!isOpen) return null;
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setImageUrl(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!title.trim()) {
+      alert('Por favor ingresa el título del juego');
+      return;
+    }
+
+    const payload = {
+      title: title.trim(),
+      platform,
+      genre,
+      condition,
+      price: Number(price) || 0,
+      description: description.trim() || 'Juego original para PlayStation en excelente estado.',
+      imageUrl: imageUrl || spidermanImg,
+      inStock,
+      featured,
+      languages,
+      releaseYear: Number(releaseYear) || 2024,
+    };
+
+    if (gameToEdit) {
+      updateGame(gameToEdit.id, payload);
+    } else {
+      addGame(payload);
+    }
+
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+      <div 
+        className="relative w-full max-w-2xl bg-[#0a1020] border border-blue-900/50 rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center">
+              {gameToEdit ? <Save className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            </div>
+            <div>
+              <h3 className="font-bold text-white text-base">
+                {gameToEdit ? 'Editar Juego en Catálogo' : 'Agregar Nuevo Juego al Catálogo'}
+              </h3>
+              <p className="text-xs text-slate-400">
+                Solo visible y editable por el administrador
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            aria-label="Cerrar modal"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="overflow-y-auto p-4 sm:p-6 space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            {/* Title */}
+            <div className="md:col-span-2">
+              <label className="text-xs font-semibold text-slate-300 block mb-1">
+                Título del Juego *
+              </label>
+              <input
+                type="text"
+                required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Ej: Final Fantasy VII Rebirth"
+                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
+            {/* Platform */}
+            <div>
+              <label className="text-xs font-semibold text-slate-300 block mb-1">
+                Plataforma PlayStation *
+              </label>
+              <select
+                value={platform}
+                onChange={(e) => setPlatform(e.target.value as Platform)}
+                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
+              >
+                <option value="PS5">PlayStation 5 (PS5)</option>
+                <option value="PS4">PlayStation 4 (PS4)</option>
+                <option value="PS3">PlayStation 3 (PS3)</option>
+                <option value="PS5 / PS4">PS5 & PS4 (Cross-Gen)</option>
+                <option value="PS4 / PS3">PS4 & PS3</option>
+              </select>
+            </div>
+
+            {/* Genre */}
+            <div>
+              <label className="text-xs font-semibold text-slate-300 block mb-1">
+                Género
+              </label>
+              <select
+                value={genre}
+                onChange={(e) => setGenre(e.target.value)}
+                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
+              >
+                <option value="Acción / Aventura">Acción / Aventura</option>
+                <option value="RPG / Rol">RPG / Rol</option>
+                <option value="Terror / Supervivencia">Terror / Supervivencia</option>
+                <option value="Carreras / Deportes">Carreras / Deportes</option>
+                <option value="Shooter / FPS">Shooter / FPS</option>
+                <option value="Lucha">Lucha</option>
+                <option value="Familiar / Plataformas">Familiar / Plataformas</option>
+              </select>
+            </div>
+
+            {/* Condition / Format */}
+            <div>
+              <label className="text-xs font-semibold text-slate-300 block mb-1">
+                Formato / Condición
+              </label>
+              <select
+                value={condition}
+                onChange={(e) => setCondition(e.target.value as GameCondition)}
+                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
+              >
+                <option value="Nuevo Físico">Nuevo Físico (Caja sellada)</option>
+                <option value="Digital Primaria">Digital Primaria</option>
+                <option value="Digital Secundaria">Digital Secundaria</option>
+                <option value="Físico Seminuevo">Físico Seminuevo (Impecable)</option>
+              </select>
+            </div>
+
+            {/* Price */}
+            <div>
+              <label className="text-xs font-semibold text-slate-300 block mb-1">
+                Precio (ARS $) *
+              </label>
+              <input
+                type="number"
+                required
+                min={1}
+                step={100}
+                value={price}
+                onChange={(e) => setPrice(Number(e.target.value))}
+                placeholder="55000"
+                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white tabular-nums focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="md:col-span-2">
+              <label className="text-xs font-semibold text-slate-300 block mb-1">
+                Descripción del juego
+              </label>
+              <textarea
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Breve reseña del juego, características o detalles del contenido incluido..."
+                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
+            {/* Image Selection Area */}
+            <div className="md:col-span-2 space-y-2">
+              <label className="text-xs font-semibold text-slate-300 block">
+                Imagen / Portada del Juego
+              </label>
+
+              {/* Direct URL input */}
+              <input
+                type="text"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="Pegar URL de imagen (https://...) o elegir una abajo"
+                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 mb-2"
+              />
+
+              {/* Upload local file */}
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 rounded-lg border border-slate-700 transition-colors">
+                  <Upload className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Subir imagen desde mi PC/Celular</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                </label>
+
+                <span className="text-[11px] text-slate-500">o elegir portada rápida:</span>
+
+                <div className="flex items-center gap-1.5">
+                  {PRESET_COVERS.map((preset) => (
+                    <button
+                      key={preset.name}
+                      type="button"
+                      onClick={() => setImageUrl(preset.url)}
+                      className={`text-[11px] px-2 py-1 rounded border transition-colors ${
+                        imageUrl === preset.url
+                          ? 'border-blue-500 bg-blue-950 text-blue-300 font-semibold'
+                          : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {preset.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Preview */}
+              {imageUrl && (
+                <div className="mt-2 flex items-center gap-3 p-2 bg-slate-950 border border-slate-800 rounded-lg">
+                  <div className="w-12 h-16 rounded overflow-hidden bg-slate-900 shrink-0">
+                    <img src={imageUrl} alt="Vista previa" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="text-xs text-slate-400 truncate">
+                    <span className="text-emerald-400 font-medium block">✓ Imagen cargada correctamente</span>
+                    <span className="text-[11px] truncate block max-w-sm">{imageUrl.substring(0, 45)}...</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* In stock and Featured toggles */}
+            <div className="md:col-span-2 flex flex-wrap items-center gap-6 pt-2">
+              <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={inStock}
+                  onChange={(e) => setInStock(e.target.checked)}
+                  className="w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700"
+                />
+                <span>Disponible en Stock</span>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={featured}
+                  onChange={(e) => setFeatured(e.target.checked)}
+                  className="w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700"
+                />
+                <span>Juego Destacado (Top)</span>
+              </label>
+            </div>
+
+          </div>
+
+          {/* Form Actions */}
+          <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-xs font-medium text-slate-400 hover:text-white transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-md shadow-blue-600/30 flex items-center gap-2 transition-all active:scale-[0.98]"
+            >
+              <Check className="w-4 h-4" />
+              <span>{gameToEdit ? 'Guardar Cambios' : 'Publicar en Catálogo'}</span>
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  );
+};

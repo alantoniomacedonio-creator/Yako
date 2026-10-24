@@ -1,0 +1,6 @@
+{
+  "name": "Total Game - PlayStation Store",
+  "description": "Tienda online de videojuegos de PlayStation (PS5, PS4 y PS3) con catálogo administrable, carrito de compras y checkout directo por WhatsApp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
