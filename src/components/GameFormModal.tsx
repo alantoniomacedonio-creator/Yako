@@ -62,9 +62,38 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          setImageUrl(reader.result);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 380;
+          const MAX_HEIGHT = 500;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+            setImageUrl(optimizedDataUrl);
+          }
+        };
+        if (typeof event.target?.result === 'string') {
+          img.src = event.target.result;
         }
       };
       reader.readAsDataURL(file);
@@ -239,24 +268,29 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
 
             {/* Image Selection Area */}
             <div className="md:col-span-2 space-y-2">
-              <label className="text-xs font-semibold text-slate-300 block">
-                Imagen / Portada del Juego
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-300 block">
+                  URL de Imagen / Portada (Directa de Internet)
+                </label>
+                <span className="text-[11px] text-blue-400 font-medium">
+                  Sin almacenamiento en la nube
+                </span>
+              </div>
 
               {/* Direct URL input */}
               <input
-                type="text"
+                type="url"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="Pegar URL de imagen (https://...) o elegir una abajo"
-                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 mb-2"
+                placeholder="Pega la URL directa de la imagen (ej: https://art.gametdb.com/... o https://...)"
+                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 mb-2 font-mono text-[11px]"
               />
 
               {/* Upload local file */}
               <div className="flex flex-wrap items-center gap-3">
                 <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 rounded-lg border border-slate-700 transition-colors">
                   <Upload className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Subir imagen desde mi PC/Celular</span>
+                  <span>Subir archivo local (Optimización automática)</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -264,7 +298,7 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
                     className="hidden"
                   />
                 </label>
-                <span className="text-[11px] text-slate-500">Formatos recomendados: WebP, JPG, PNG</span>
+                <span className="text-[11px] text-slate-500">Se guarda directamente en tu catálogo local</span>
               </div>
 
               {/* Preview */}
