@@ -32,7 +32,13 @@ export const CartDrawer: React.FC = () => {
     if (customerName.trim()) text += `👤 Cliente: ${customerName}\n`;
     text += `📦 Modalidad: ${deliveryMethod}\n`;
 
-    navigator.clipboard.writeText(text);
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {});
+      }
+    } catch {
+      // fallback
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

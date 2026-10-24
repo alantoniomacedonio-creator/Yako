@@ -80,6 +80,17 @@ const CatalogContent: React.FC = () => {
       });
   }, [games, platformFilter, genreFilter, searchQuery, sortBy]);
 
+  // Progressive rendering to ensure instant loading on mobile devices without freezing memory
+  const [visibleCount, setVisibleCount] = useState(24);
+
+  React.useEffect(() => {
+    setVisibleCount(24);
+  }, [searchQuery, platformFilter, genreFilter, sortBy]);
+
+  const displayedGames = useMemo(() => {
+    return filteredGames.slice(0, visibleCount);
+  }, [filteredGames, visibleCount]);
+
   const handleOpenEdit = (game: Game) => {
     setGameToEdit(game);
     setIsGameFormOpen(true);
@@ -286,15 +297,32 @@ const CatalogContent: React.FC = () => {
 
         {/* Product Cards Grid: 2 columns on mobile (celular), scaling up on larger screens */}
         {filteredGames.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6">
-            {filteredGames.map((game) => (
-              <GameCard
-                key={game.id}
-                game={game}
-                onViewDetails={setSelectedGameForDetails}
-                onEditGame={handleOpenEdit}
-              />
-            ))}
+          <div>
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6">
+              {displayedGames.map((game) => (
+                <GameCard
+                  key={game.id}
+                  game={game}
+                  onViewDetails={setSelectedGameForDetails}
+                  onEditGame={handleOpenEdit}
+                />
+              ))}
+            </div>
+
+            {visibleCount < filteredGames.length && (
+              <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount((prev) => Math.min(prev + 24, filteredGames.length))}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-blue-600/30 transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+                >
+                  <span>Cargar más juegos ({filteredGames.length - visibleCount} restantes)</span>
+                </button>
+                <span className="text-[11px] text-slate-500">
+                  Mostrando {displayedGames.length} de {filteredGames.length} juegos
+                </span>
+              </div>
+            )}
           </div>
         ) : (
           <div className="py-20 text-center bg-[#0b1222]/50 border border-slate-800/80 rounded-2xl p-8 max-w-md mx-auto space-y-4">

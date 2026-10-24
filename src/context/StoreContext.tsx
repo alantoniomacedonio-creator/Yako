@@ -27,36 +27,88 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-// Updated version key to force all browsers to discard old localStorage states
-const STORAGE_KEY_GAMES = 'total_game_catalog_ps3_v8_fixed';
+// Updated version key
+const STORAGE_KEY_GAMES = 'total_game_catalog_ps3_v9_stable';
 const STORAGE_KEY_CART = 'total_game_cart_v2';
 const STORAGE_KEY_ADMIN = 'total_game_admin_auth_v1';
 
-// Legacy keys to purge automatically from user browsers
-const LEGACY_KEYS = [
-  'total_game_catalog_v1',
-  'total_game_catalog_v2',
-  'total_game_catalog_v3',
-  'total_game_catalog_v4',
-  'total_game_catalog_v5',
-  'total_game_catalog_v6',
-  'total_game_catalog_v7',
-  'total_game_cart_v1',
-];
-
-const purgeLegacyStorage = () => {
+// Safe localStorage wrapper that never throws in Private Browsing / iOS Safari
+const isStorageAvailable = () => {
   try {
-    LEGACY_KEYS.forEach((key) => localStorage.removeItem(key));
-    // Also remove any old keys that start with total_game_catalog_ but aren't current
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('total_game_catalog_') && k !== STORAGE_KEY_GAMES) {
-        localStorage.removeItem(k);
-      }
-    }
+    if (typeof window === 'undefined' || !window.localStorage) return false;
+    const testKey = '__storage_test__';
+    window.localStorage.setItem(testKey, testKey);
+    window.localStorage.removeItem(testKey);
+    return true;
   } catch {
-    // Ignore storage errors in restricted contexts
+    return false;
   }
+};
+
+const safeStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      if (isStorageAvailable()) {
+        return window.localStorage.getItem(key);
+      }
+    } catch {
+      return null;
+    }
+    return null;
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      if (isStorageAvailable()) {
+        window.localStorage.setItem(key, value);
+      }
+    } catch {
+      // ignore quota exceeded or access denied
+    }
+  },
+  removeItem: (key: string): void => {
+    try {
+      if (isStorageAvailable()) {
+        window.localStorage.removeItem(key);
+      }
+    } catch {}
+  },
+  purgeLegacyKeys: () => {
+    try {
+      if (!isStorageAvailable()) return;
+      const legacyKeys = [
+        'total_game_catalog_v1',
+        'total_game_catalog_v2',
+        'total_game_catalog_v3',
+        'total_game_catalog_v4',
+        'total_game_catalog_v5',
+        'total_game_catalog_v6',
+        'total_game_catalog_v7',
+        'total_game_catalog_ps3_v8_fixed',
+        'total_game_cart_v1',
+      ];
+      legacyKeys.forEach((k) => {
+        try {
+          window.localStorage.removeItem(k);
+        } catch {}
+      });
+
+      // Collect all keys to remove without modifying storage during iteration
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const key = window.localStorage.key(i);
+        if (key && key.startsWith('total_game_catalog_') && key !== STORAGE_KEY_GAMES) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach((k) => {
+        try {
+          window.localStorage.removeItem(k);
+        } catch {}
+      });
+    } catch {
+      // ignore
+    }
+  },
 };
 
 // Hardcoded admin credentials
@@ -67,8 +119,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Games state with auto-migration and stale data detection
   const [games, setGames] = useState<Game[]>(() => {
     try {
-      purgeLegacyStorage();
-      const saved = localStorage.getItem(STORAGE_KEY_GAMES);
+      safeStorage.purgeLegacyKeys();
+      const saved = safeStorage.getItem(STORAGE_KEY_GAMES);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -83,7 +135,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           );
 
           if (hasOldData) {
-            localStorage.removeItem(STORAGE_KEY_GAMES);
+            safeStorage.removeItem(STORAGE_KEY_GAMES);
             return INITIAL_GAMES;
           }
 
@@ -110,7 +162,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Admin login state (hardcoded user)
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
     try {
-      return localStorage.getItem(STORAGE_KEY_ADMIN) === 'true';
+      return safeStorage.getItem(STORAGE_KEY_ADMIN) === 'true';
     } catch {
       return false;
     }
@@ -123,28 +175,28 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Clear any legacy cart or stale cart on mount
   useEffect(() => {
     try {
-      purgeLegacyStorage();
-      localStorage.removeItem(STORAGE_KEY_CART);
+      safeStorage.purgeLegacyKeys();
+      safeStorage.removeItem(STORAGE_KEY_CART);
     } catch {
       // ignore
     }
   }, []);
 
-  // Persist games
+  // Persist games safely
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY_GAMES, JSON.stringify(games));
+      safeStorage.setItem(STORAGE_KEY_GAMES, JSON.stringify(games));
     } catch (e) {
-      console.error('Failed to save games to localStorage', e);
+      console.warn('Failed to save games to storage', e);
     }
   }, [games]);
 
-  // Persist admin auth
+  // Persist admin auth safely
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY_ADMIN, isAdmin ? 'true' : 'false');
+      safeStorage.setItem(STORAGE_KEY_ADMIN, isAdmin ? 'true' : 'false');
     } catch (e) {
-      console.error('Failed to save admin state', e);
+      console.warn('Failed to save admin state', e);
     }
   }, [isAdmin]);
 
@@ -170,8 +222,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const resetCatalog = () => {
     try {
-      localStorage.removeItem(STORAGE_KEY_GAMES);
-      purgeLegacyStorage();
+      safeStorage.removeItem(STORAGE_KEY_GAMES);
+      safeStorage.purgeLegacyKeys();
     } catch {}
     setGames(INITIAL_GAMES);
   };
