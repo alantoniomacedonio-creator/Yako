@@ -28,10 +28,8 @@ interface StoreContextType {
   cartTotal: number;
   lastAddedGame: Game | null;
   clearLastAddedGame: () => void;
-  isSavingToCloud: boolean;
-  saveSuccessMessage: string | null;
-  clearSaveSuccessMessage: () => void;
-  saveAllChangesToCloud: () => Promise<{ success: boolean; message: string }>;
+  isSavingToSupabase: boolean;
+  saveChangesToSupabase: () => Promise<{ success: boolean; message: string }>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -172,32 +170,22 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [lastAddedGame, setLastAddedGame] = useState<Game | null>(null);
 
-  // Big Red Button state for direct Supabase cloud saving
-  const [isSavingToCloud, setIsSavingToCloud] = useState<boolean>(false);
-  const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
-
-  const clearSaveSuccessMessage = () => {
-    setSaveSuccessMessage(null);
-  };
-
-  // Admin login state (hardcoded user)
-  const [isAdmin, setIsAdmin] = useState<boolean>(() => {
-    try {
-      return safeStorage.getItem(STORAGE_KEY_ADMIN) === 'true';
-    } catch {
-      return false;
-    }
-  });
+  // Admin login state: ALWAYS false by default on entry. Never auto-logins.
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   // Cart state: Renews fresh every time user enters the page
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Clear any legacy cart or stale cart on mount
+  // Clear any legacy cart or stale admin auth from storage on mount
   useEffect(() => {
     try {
       safeStorage.purgeLegacyKeys();
       safeStorage.removeItem(STORAGE_KEY_CART);
+      safeStorage.removeItem(STORAGE_KEY_ADMIN);
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        window.sessionStorage.removeItem(STORAGE_KEY_ADMIN);
+      }
     } catch {
       // ignore
     }
@@ -270,14 +258,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [games]);
 
-  // Persist admin auth safely
-  useEffect(() => {
-    try {
-      safeStorage.setItem(STORAGE_KEY_ADMIN, isAdmin ? 'true' : 'false');
-    } catch (e) {
-      console.warn('Failed to save admin state', e);
-    }
-  }, [isAdmin]);
 
   const addGame = (gameData: Omit<Game, 'id' | 'createdAt'>) => {
     const newGame: Game = {
@@ -331,10 +311,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  // Guarda todos los cambios en Supabase con 1 clic (para el botón rojo del Administrador)
-  const saveAllChangesToCloud = async (): Promise<{ success: boolean; message: string }> => {
-    setIsSavingToCloud(true);
-    setSaveSuccessMessage(null);
+  const [isSavingToSupabase, setIsSavingToSupabase] = useState(false);
+
+  // Guarda todos los cambios realizados por el admin en Supabase
+  const saveChangesToSupabase = async (): Promise<{ success: boolean; message: string }> => {
+    setIsSavingToSupabase(true);
     try {
       const client = getSupabaseClient();
       const rows = games.map(mapGameToRow);
@@ -344,12 +325,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const { error } = await client.from('games').upsert(chunk, { onConflict: 'id' });
         if (error) throw error;
       }
-      setIsSavingToCloud(false);
-      const msg = `¡Guardado en la nube! Se actualizaron los ${rows.length} juegos en Supabase para todos tus clientes.`;
-      setSaveSuccessMessage(msg);
-      return { success: true, message: msg };
+      setIsSavingToSupabase(false);
+      return { success: true, message: `¡${rows.length} juegos guardados en Supabase con éxito!` };
     } catch (err: any) {
-      setIsSavingToCloud(false);
+      setIsSavingToSupabase(false);
       console.error('Error saving to Supabase:', err);
       return { success: false, message: err.message || 'Error al guardar en Supabase' };
     }
@@ -449,10 +428,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         cartTotal,
         lastAddedGame,
         clearLastAddedGame,
-        isSavingToCloud,
-        saveSuccessMessage,
-        clearSaveSuccessMessage,
-        saveAllChangesToCloud,
+        isSavingToSupabase,
+        saveChangesToSupabase,
       }}
     >
       {children}
