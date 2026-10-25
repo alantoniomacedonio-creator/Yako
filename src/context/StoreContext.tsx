@@ -5,7 +5,6 @@ import {
   getSupabaseClient,
   mapRowToGame,
   mapGameToRow,
-  saveSupabaseConfig,
 } from '../lib/supabase';
 
 interface StoreContextType {
@@ -29,10 +28,10 @@ interface StoreContextType {
   cartTotal: number;
   lastAddedGame: Game | null;
   clearLastAddedGame: () => void;
-  isSupabaseConnected: boolean;
-  isSyncingToSupabase: boolean;
-  syncToSupabase: () => Promise<{ success: boolean; message: string }>;
-  saveCloudCredentials: (url: string, anonKey: string) => Promise<{ success: boolean; message: string }>;
+  isSavingToCloud: boolean;
+  saveSuccessMessage: string | null;
+  clearSaveSuccessMessage: () => void;
+  saveAllChangesToCloud: () => Promise<{ success: boolean; message: string }>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -173,9 +172,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [lastAddedGame, setLastAddedGame] = useState<Game | null>(null);
 
-  // Supabase cloud database states
-  const [isSupabaseConnected, setIsSupabaseConnected] = useState<boolean>(false);
-  const [isSyncingToSupabase, setIsSyncingToSupabase] = useState<boolean>(false);
+  // Big Red Button state for direct Supabase cloud saving
+  const [isSavingToCloud, setIsSavingToCloud] = useState<boolean>(false);
+  const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
+
+  const clearSaveSuccessMessage = () => {
+    setSaveSuccessMessage(null);
+  };
 
   // Admin login state (hardcoded user)
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
@@ -200,15 +203,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
-  // Initialize Supabase and listen for Realtime broadcast across all devices
+  // Load games from Supabase on mount and listen for Realtime broadcast across all devices
   useEffect(() => {
-    const client = getSupabaseClient();
-    if (!client) {
-      setIsSupabaseConnected(false);
-      return;
-    }
-
     let isMounted = true;
+    const client = getSupabaseClient();
 
     const initSupabase = async () => {
       try {
@@ -219,19 +217,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
         if (error) {
           console.warn('Supabase fetch error:', error);
-          if (isMounted) setIsSupabaseConnected(false);
           return;
         }
 
-        if (isMounted) {
-          setIsSupabaseConnected(true);
-          if (data && data.length > 0) {
-            setGames(data.map(mapRowToGame));
-          }
+        if (isMounted && data && data.length > 0) {
+          setGames(data.map(mapRowToGame));
         }
       } catch (err) {
         console.warn('Supabase init failed:', err);
-        if (isMounted) setIsSupabaseConnected(false);
       }
     };
 
@@ -338,53 +331,27 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  // Upload all 185 initial games to Supabase in batches of 40
-  const syncToSupabase = async (): Promise<{ success: boolean; message: string }> => {
-    const client = getSupabaseClient();
-    if (!client) {
-      return { success: false, message: 'Supabase no está configurado.' };
-    }
-    setIsSyncingToSupabase(true);
+  // Guarda todos los cambios en Supabase con 1 clic (para el botón rojo del Administrador)
+  const saveAllChangesToCloud = async (): Promise<{ success: boolean; message: string }> => {
+    setIsSavingToCloud(true);
+    setSaveSuccessMessage(null);
     try {
-      const rows = games.length > 0 ? games.map(mapGameToRow) : INITIAL_GAMES.map(mapGameToRow);
+      const client = getSupabaseClient();
+      const rows = games.map(mapGameToRow);
       const BATCH_SIZE = 40;
       for (let i = 0; i < rows.length; i += BATCH_SIZE) {
         const chunk = rows.slice(i, i + BATCH_SIZE);
         const { error } = await client.from('games').upsert(chunk, { onConflict: 'id' });
         if (error) throw error;
       }
-      setIsSyncingToSupabase(false);
-      setIsSupabaseConnected(true);
-      return {
-        success: true,
-        message: `¡Se cargaron exitosamente ${rows.length} juegos a tu base de datos Supabase!`,
-      };
+      setIsSavingToCloud(false);
+      const msg = `¡Guardado en la nube! Se actualizaron los ${rows.length} juegos en Supabase para todos tus clientes.`;
+      setSaveSuccessMessage(msg);
+      return { success: true, message: msg };
     } catch (err: any) {
-      setIsSyncingToSupabase(false);
-      return { success: false, message: err.message || 'Error al sincronizar con Supabase' };
-    }
-  };
-
-  const saveCloudCredentials = async (url: string, anonKey: string): Promise<{ success: boolean; message: string }> => {
-    try {
-      saveSupabaseConfig(url, anonKey);
-      const client = getSupabaseClient();
-      if (!client) {
-        return { success: false, message: 'No se pudo inicializar Supabase con esas credenciales.' };
-      }
-      const { data, error } = await client.from('games').select('id').limit(1);
-      if (error) {
-        return { success: false, message: `Error al conectar: ${error.message}. Asegúrate de haber ejecutado el script SQL en Supabase.` };
-      }
-      setIsSupabaseConnected(true);
-      // If table has data, load it immediately
-      const { data: fullData } = await client.from('games').select('*').order('created_at', { ascending: false });
-      if (fullData && fullData.length > 0) {
-        setGames(fullData.map(mapRowToGame));
-      }
-      return { success: true, message: '¡Conexión exitosa con Supabase! Los cambios ahora se reflejan en tiempo real.' };
-    } catch (err: any) {
-      return { success: false, message: err.message || 'Error de conexión' };
+      setIsSavingToCloud(false);
+      console.error('Error saving to Supabase:', err);
+      return { success: false, message: err.message || 'Error al guardar en Supabase' };
     }
   };
 
@@ -482,10 +449,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         cartTotal,
         lastAddedGame,
         clearLastAddedGame,
-        isSupabaseConnected,
-        isSyncingToSupabase,
-        syncToSupabase,
-        saveCloudCredentials,
+        isSavingToCloud,
+        saveSuccessMessage,
+        clearSaveSuccessMessage,
+        saveAllChangesToCloud,
       }}
     >
       {children}
