@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Upload, Image as ImageIcon, Save, Check, Plus } from 'lucide-react';
+import { X, Image as ImageIcon, Save, Check, Plus } from 'lucide-react';
 import { Game, Platform, GameCondition } from '../types/game';
 import { useStore } from '../context/StoreContext';
 import { formatPrice } from '../utils/whatsapp';
@@ -60,48 +60,6 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 380;
-          const MAX_HEIGHT = 500;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.drawImage(img, 0, 0, width, height);
-            const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
-            setImageUrl(optimizedDataUrl);
-          }
-        };
-        if (typeof event.target?.result === 'string') {
-          img.src = event.target.result;
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -160,7 +118,7 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
             aria-label="Cerrar modal"
           >
             <X className="w-5 h-5" />
@@ -332,14 +290,14 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
               />
             </div>
 
-            {/* Image Selection Area */}
+            {/* Image Selection Area - Solo URL directa de internet */}
             <div className="md:col-span-2 space-y-2 p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-blue-300 block">
-                  URL de Imagen / Carátula (Directa de Internet)
+                  URL de Imagen / Carátula (Internet)
                 </label>
-                <span className="text-[11px] text-emerald-400 font-medium">
-                  Directo desde la web (sin Cloud Run)
+                <span className="text-[11px] text-slate-400 font-medium">
+                  Enlace directo web (.jpg o .png)
                 </span>
               </div>
 
@@ -361,21 +319,6 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
                     Limpiar
                   </button>
                 )}
-              </div>
-
-              {/* Upload local file */}
-              <div className="flex flex-wrap items-center gap-3 pt-1">
-                <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 rounded-lg border border-slate-700 transition-colors">
-                  <Upload className="w-3.5 h-3.5 text-blue-400" />
-                  <span>O sube una imagen de tu dispositivo</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </label>
-                <span className="text-[11px] text-slate-500">Se adapta y guarda automáticamente en tu navegador</span>
               </div>
 
               {/* Preview */}
@@ -433,13 +376,13 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-slate-400 hover:text-white transition-colors"
+              className="px-4 py-2 text-xs font-medium text-slate-400 hover:text-white transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-md shadow-blue-600/30 flex items-center gap-2 transition-all active:scale-[0.98]"
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-md shadow-blue-600/30 flex items-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
             >
               <Check className="w-4 h-4" />
               <span>{gameToEdit ? 'Guardar Cambios' : 'Publicar en Catálogo'}</span>
