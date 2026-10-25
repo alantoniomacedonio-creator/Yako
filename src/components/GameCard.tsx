@@ -52,23 +52,35 @@ export const GameCard: React.FC<GameCardProps> = ({
       onClick={() => onViewDetails(game)}
       className="group relative flex flex-col bg-[#0b1222] border border-slate-800/80 hover:border-blue-600/60 rounded-xl overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-950/40 cursor-pointer"
     >
-      {/* Admin Floating Quick Actions */}
+      {/* Admin Quick Action Banner: Highly visible across cards */}
       {isAdmin && (
-        <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5 bg-slate-950/90 backdrop-blur-md p-1 rounded-lg border border-slate-700 shadow-md">
-          <button
-            onClick={handleEdit}
-            className="p-1.5 text-slate-300 hover:text-blue-400 hover:bg-slate-800 rounded transition-colors"
-            title="Editar juego"
-          >
-            <Edit3 className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={handleDelete}
-            className="p-1.5 text-slate-300 hover:text-rose-400 hover:bg-slate-800 rounded transition-colors"
-            title="Eliminar juego"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+        <div 
+          onClick={(e) => e.stopPropagation()} 
+          className="bg-amber-950/90 border-b border-amber-500/40 px-2.5 py-1.5 flex items-center justify-between z-30 relative"
+        >
+          <span className="text-[10px] font-black text-amber-300 uppercase tracking-wider flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+            Admin yako
+          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={handleEdit}
+              className="px-2 py-0.5 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold text-[11px] rounded flex items-center gap-1 shadow transition-all cursor-pointer"
+              title="Editar esta carta: carátula, datos, tipo de juego"
+            >
+              <Edit3 className="w-3 h-3" />
+              <span>Editar Carta</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="p-1 bg-rose-950/80 hover:bg-rose-900 active:scale-95 text-rose-300 hover:text-white rounded border border-rose-800/60 transition-all cursor-pointer"
+              title="Eliminar este juego"
+            >
+              <Trash2 className="w-3 h-3" />
+            </button>
+          </div>
         </div>
       )}
 

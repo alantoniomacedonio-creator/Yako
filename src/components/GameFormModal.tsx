@@ -191,31 +191,11 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
                 onChange={(e) => setPlatform(e.target.value as Platform)}
                 className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
               >
-                <option value="PS5">PlayStation 5 (PS5)</option>
-                <option value="PS4">PlayStation 4 (PS4)</option>
                 <option value="PS3">PlayStation 3 (PS3)</option>
+                <option value="PS4">PlayStation 4 (PS4)</option>
+                <option value="PS5">PlayStation 5 (PS5)</option>
                 <option value="PS5 / PS4">PS5 & PS4 (Cross-Gen)</option>
                 <option value="PS4 / PS3">PS4 & PS3</option>
-              </select>
-            </div>
-
-            {/* Genre */}
-            <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">
-                Género
-              </label>
-              <select
-                value={genre}
-                onChange={(e) => setGenre(e.target.value)}
-                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
-              >
-                <option value="Acción / Aventura">Acción / Aventura</option>
-                <option value="RPG / Rol">RPG / Rol</option>
-                <option value="Terror / Supervivencia">Terror / Supervivencia</option>
-                <option value="Carreras / Deportes">Carreras / Deportes</option>
-                <option value="Shooter / FPS">Shooter / FPS</option>
-                <option value="Lucha">Lucha</option>
-                <option value="Familiar / Plataformas">Familiar / Plataformas</option>
               </select>
             </div>
 
@@ -235,6 +215,57 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
               </select>
             </div>
 
+            {/* Tipo de Juego / Género: Full custom & quick buttons */}
+            <div className="md:col-span-2 p-3 bg-slate-950/70 border border-blue-900/40 rounded-xl space-y-2.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <label className="text-xs font-bold text-blue-300 block">
+                  Tipo de Juego / Género * (Autos, Acción, Zombies, etc.)
+                </label>
+                <span className="text-[11px] text-slate-400">
+                  Selecciona una categoría o escribe tu propio tipo
+                </span>
+              </div>
+
+              {/* Quick Select Buttons */}
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { label: '🏎️ Autos', val: 'Autos / Carreras' },
+                  { label: '🧟 Zombies', val: 'Zombies / Terror' },
+                  { label: '⚔️ Acción', val: 'Acción / Aventura' },
+                  { label: '⚽ Deportes', val: 'Fútbol / Deportes' },
+                  { label: '🎯 Shooter', val: 'Shooter / Disparos' },
+                  { label: '🥊 Lucha', val: 'Lucha / Peleas' },
+                  { label: '👪 Familiar', val: 'Familiar / Niños' },
+                  { label: '🗺️ Mundo Abierto', val: 'Mundo Abierto' },
+                  { label: '🧙 RPG', val: 'RPG / Rol' },
+                ].map((item) => (
+                  <button
+                    key={item.val}
+                    type="button"
+                    onClick={() => setGenre(item.val)}
+                    className={`px-2.5 py-1 text-xs rounded-lg font-bold transition-all cursor-pointer ${
+                      genre === item.val
+                        ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 ring-2 ring-blue-400'
+                        : 'bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/80'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Text input to allow any custom genre or type */}
+              <div className="pt-1">
+                <input
+                  type="text"
+                  value={genre}
+                  onChange={(e) => setGenre(e.target.value)}
+                  placeholder="Escribe o personaliza el tipo de juego (ej: Autos / Carreras, Zombies / Terror)..."
+                  className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
+
             {/* Price */}
             <div>
               <label className="text-xs font-semibold text-slate-300 block mb-1">
@@ -247,7 +278,7 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
                 step={100}
                 value={price}
                 onChange={(e) => setPrice(Number(e.target.value))}
-                placeholder="55000"
+                placeholder="5900"
                 className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white tabular-nums focus:outline-none focus:border-blue-500"
               />
             </div>
@@ -258,7 +289,7 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
                 Descripción del juego
               </label>
               <textarea
-                rows={3}
+                rows={2}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Breve reseña del juego, características o detalles del contenido incluido..."
@@ -267,30 +298,41 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
             </div>
 
             {/* Image Selection Area */}
-            <div className="md:col-span-2 space-y-2">
+            <div className="md:col-span-2 space-y-2 p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-slate-300 block">
-                  URL de Imagen / Portada (Directa de Internet)
+                <label className="text-xs font-bold text-blue-300 block">
+                  URL de Imagen / Carátula (Directa de Internet)
                 </label>
-                <span className="text-[11px] text-blue-400 font-medium">
-                  Sin almacenamiento en la nube
+                <span className="text-[11px] text-emerald-400 font-medium">
+                  Directo desde la web (sin Cloud Run)
                 </span>
               </div>
 
-              {/* Direct URL input */}
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="Pega la URL directa de la imagen (ej: https://art.gametdb.com/... o https://...)"
-                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 mb-2 font-mono text-[11px]"
-              />
+              {/* Direct URL input with clear button */}
+              <div className="relative">
+                <input
+                  type="url"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="Pega la URL de la foto (ej: https://...)"
+                  className="w-full pl-3.5 pr-16 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono text-[11px]"
+                />
+                {imageUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setImageUrl('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 hover:text-white bg-slate-800 px-2 py-0.5 rounded cursor-pointer"
+                  >
+                    Limpiar
+                  </button>
+                )}
+              </div>
 
               {/* Upload local file */}
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3 pt-1">
                 <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 rounded-lg border border-slate-700 transition-colors">
                   <Upload className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Subir archivo local (Optimización automática)</span>
+                  <span>O sube una imagen de tu dispositivo</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -298,20 +340,31 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
                     className="hidden"
                   />
                 </label>
-                <span className="text-[11px] text-slate-500">Se guarda directamente en tu catálogo local</span>
+                <span className="text-[11px] text-slate-500">Se adapta y guarda automáticamente en tu navegador</span>
               </div>
 
               {/* Preview */}
-              {imageUrl && (
-                <div className="mt-2 flex items-center gap-3 p-2 bg-slate-950 border border-slate-800 rounded-lg">
-                  <div className="w-12 h-16 rounded overflow-hidden bg-slate-900 shrink-0">
-                    <img src={imageUrl} alt="Vista previa" className="w-full h-full object-cover" />
+              {imageUrl ? (
+                <div className="mt-2 flex items-center gap-3 p-2 bg-slate-900 border border-slate-800 rounded-lg">
+                  <div className="w-14 h-18 rounded overflow-hidden bg-slate-950 shrink-0 border border-slate-700">
+                    <img 
+                      src={imageUrl} 
+                      alt="Vista previa" 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.igdb.com/igdb/image/upload/t_cover_big/nocover.webp';
+                      }}
+                    />
                   </div>
-                  <div className="text-xs text-slate-400 truncate">
-                    <span className="text-emerald-400 font-medium block">✓ Imagen cargada correctamente</span>
-                    <span className="text-[11px] truncate block max-w-sm">{imageUrl.substring(0, 45)}...</span>
+                  <div className="text-xs text-slate-400 truncate flex-1">
+                    <span className="text-emerald-400 font-bold block">✓ Vista previa de carátula</span>
+                    <span className="text-[11px] truncate block text-slate-300 font-mono">{imageUrl}</span>
                   </div>
                 </div>
+              ) : (
+                <p className="text-[11px] text-slate-500 italic">
+                  Tip: Puedes buscar la carátula en Google Imágenes, hacer click derecho &gt; "Copiar dirección de la imagen" y pegarla aquí arriba.
+                </p>
               )}
             </div>
 

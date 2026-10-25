@@ -46,8 +46,51 @@ const CatalogContent: React.FC = () => {
           }
         }
         // Genre match
-        if (genreFilter !== 'TODOS' && game.genre !== genreFilter) {
-          return false;
+        if (genreFilter !== 'TODOS') {
+          const gLower = (game.genre || '').toLowerCase();
+          const filterLower = genreFilter.toLowerCase();
+          
+          if (genreFilter === 'ZOMBIES') {
+            if (!gLower.includes('zombie') && !gLower.includes('terror') && !gLower.includes('resident evil') && !gLower.includes('survival')) {
+              return false;
+            }
+          } else if (genreFilter === 'AUTOS') {
+            if (!gLower.includes('auto') && !gLower.includes('carrera') && !gLower.includes('racing') && !gLower.includes('rally')) {
+              return false;
+            }
+          } else if (genreFilter === 'ACCION') {
+            if (!gLower.includes('acción') && !gLower.includes('accion') && !gLower.includes('aventura')) {
+              return false;
+            }
+          } else if (genreFilter === 'DEPORTES') {
+            if (!gLower.includes('deporte') && !gLower.includes('fútbol') && !gLower.includes('futbol') && !gLower.includes('fifa') && !gLower.includes('pes')) {
+              return false;
+            }
+          } else if (genreFilter === 'SHOOTER') {
+            if (!gLower.includes('shooter') && !gLower.includes('disparo') && !gLower.includes('fps')) {
+              return false;
+            }
+          } else if (genreFilter === 'LUCHA') {
+            if (!gLower.includes('lucha') && !gLower.includes('pelea') && !gLower.includes('fighting')) {
+              return false;
+            }
+          } else if (genreFilter === 'FAMILIAR') {
+            if (!gLower.includes('familiar') && !gLower.includes('niño') && !gLower.includes('plataforma') && !gLower.includes('lego')) {
+              return false;
+            }
+          } else if (genreFilter === 'MUNDO_ABIERTO') {
+            if (!gLower.includes('mundo abierto') && !gLower.includes('open world')) {
+              return false;
+            }
+          } else if (genreFilter === 'RPG') {
+            if (!gLower.includes('rpg') && !gLower.includes('rol')) {
+              return false;
+            }
+          } else {
+            if (!gLower.includes(filterLower)) {
+              return false;
+            }
+          }
         }
         // Search query match
         if (searchQuery.trim()) {
@@ -132,15 +175,15 @@ const CatalogContent: React.FC = () => {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => {
-                  if (confirm('¿Restablecer el catálogo a los 181 juegos oficiales ($5.900 c/u)?')) {
+                  if (confirm('¿Restablecer el catálogo a los 185 juegos oficiales ($5.900 c/u)?')) {
                     resetCatalog();
                   }
                 }}
                 className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold rounded-lg border border-slate-700 transition-all flex items-center gap-1.5"
-                title="Restablece la lista a los 181 juegos oficiales"
+                title="Restablece la lista a los 185 juegos oficiales"
               >
                 <RefreshCw className="w-3.5 h-3.5 text-blue-400" />
-                <span>Restablecer Catálogo (181)</span>
+                <span>Restablecer Catálogo (185)</span>
               </button>
               <button
                 onClick={handleOpenCreate}
@@ -270,6 +313,15 @@ const CatalogContent: React.FC = () => {
                   className="appearance-none pl-3 pr-8 py-2.5 bg-[#0b1222] border border-slate-800 rounded-xl text-xs font-medium text-slate-300 focus:outline-none focus:border-blue-500 cursor-pointer"
                 >
                   <option value="TODOS">Todos los géneros</option>
+                  <option value="ZOMBIES">🧟 Zombies / Terror</option>
+                  <option value="AUTOS">🏎️ Autos / Carreras</option>
+                  <option value="ACCION">⚔️ Acción / Aventura</option>
+                  <option value="DEPORTES">⚽ Fútbol / Deportes</option>
+                  <option value="SHOOTER">🎯 Shooter / FPS</option>
+                  <option value="LUCHA">🥊 Lucha</option>
+                  <option value="FAMILIAR">👪 Familiar / Niños</option>
+                  <option value="MUNDO_ABIERTO">🗺️ Mundo Abierto</option>
+                  <option value="RPG">🧙 RPG / Rol</option>
                   {uniqueGenres.map((g) => (
                     <option key={g} value={g}>
                       {g}
@@ -292,6 +344,38 @@ const CatalogContent: React.FC = () => {
               </select>
             </div>
 
+          </div>
+
+          {/* Quick Category Chips for One-Click Navigation (Autos, Zombies, Acción, etc.) */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <span className="text-[11px] font-bold text-slate-400 shrink-0 flex items-center gap-1 mr-1">
+              <Filter className="w-3 h-3 text-blue-400" /> Géneros:
+            </span>
+            {[
+              { id: 'TODOS', label: 'Todos' },
+              { id: 'ZOMBIES', label: '🧟 Zombies' },
+              { id: 'AUTOS', label: '🏎️ Autos' },
+              { id: 'ACCION', label: '⚔️ Acción' },
+              { id: 'DEPORTES', label: '⚽ Deportes' },
+              { id: 'SHOOTER', label: '🎯 Shooter' },
+              { id: 'LUCHA', label: '🥊 Lucha' },
+              { id: 'FAMILIAR', label: '👪 Familiar' },
+              { id: 'MUNDO_ABIERTO', label: '🗺️ Mundo Abierto' },
+              { id: 'RPG', label: '🧙 RPG' },
+            ].map((chip) => (
+              <button
+                key={chip.id}
+                type="button"
+                onClick={() => setGenreFilter(chip.id)}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg whitespace-nowrap transition-all cursor-pointer ${
+                  genreFilter === chip.id
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 ring-2 ring-blue-400'
+                    : 'bg-[#0b1222] text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-800'
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -349,6 +433,7 @@ const CatalogContent: React.FC = () => {
       <GameDetailModal
         game={selectedGameForDetails}
         onClose={() => setSelectedGameForDetails(null)}
+        onEditGame={handleOpenEdit}
       />
 
       <AdminLoginModal

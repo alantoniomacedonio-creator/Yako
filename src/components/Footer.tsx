@@ -74,7 +74,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdminLogin }) => {
                 title="Sincronizar y actualizar a la última versión del catálogo"
               >
                 <RefreshCw className="w-3.5 h-3.5 text-blue-400" />
-                <span>Sincronizar catálogo (181 juegos a $5.900)</span>
+                <span>Sincronizar catálogo (185 juegos a $5.900)</span>
               </button>
 
               {isAdmin ? (

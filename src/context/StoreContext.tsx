@@ -27,8 +27,8 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-// Updated version key with all 181 games having public internet cover URLs
-const STORAGE_KEY_GAMES = 'total_game_catalog_ps3_v10_urls';
+// Updated version key with categorized genres (Autos, Zombies, Acción, Deportes, etc.)
+const STORAGE_KEY_GAMES = 'total_game_catalog_ps3_v13_categorized';
 const STORAGE_KEY_CART = 'total_game_cart_v2';
 const STORAGE_KEY_ADMIN = 'total_game_admin_auth_v1';
 
@@ -85,6 +85,9 @@ const safeStorage = {
         'total_game_catalog_v7',
         'total_game_catalog_ps3_v8_fixed',
         'total_game_catalog_ps3_v9_stable',
+        'total_game_catalog_ps3_v10_urls',
+        'total_game_catalog_ps3_v11_re_fixed',
+        'total_game_catalog_ps3_v12_covers_audited',
         'total_game_cart_v1',
       ];
       legacyKeys.forEach((k) => {

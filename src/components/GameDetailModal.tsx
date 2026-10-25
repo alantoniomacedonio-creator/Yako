@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShoppingCart, MessageCircle, Check, Gamepad2, Globe, Calendar, Award } from 'lucide-react';
+import { X, ShoppingCart, MessageCircle, Check, Gamepad2, Globe, Calendar, Award, Edit3 } from 'lucide-react';
 import { Game } from '../types/game';
 import { formatPrice, generateSingleGameWhatsAppUrl } from '../utils/whatsapp';
 import { useStore } from '../context/StoreContext';
@@ -7,10 +7,11 @@ import { useStore } from '../context/StoreContext';
 interface GameDetailModalProps {
   game: Game | null;
   onClose: () => void;
+  onEditGame?: (game: Game) => void;
 }
 
-export const GameDetailModal: React.FC<GameDetailModalProps> = ({ game, onClose }) => {
-  const { addToCart } = useStore();
+export const GameDetailModal: React.FC<GameDetailModalProps> = ({ game, onClose, onEditGame }) => {
+  const { addToCart, isAdmin } = useStore();
   const [imgError, setImgError] = useState(false);
 
   if (!game) return null;
@@ -146,6 +147,22 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({ game, onClose 
 
               {/* Action Buttons */}
               <div className="pt-3 space-y-2.5">
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      if (onEditGame) {
+                        onEditGame(game);
+                      }
+                    }}
+                    className="w-full py-3 px-4 rounded-xl font-bold text-xs bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all cursor-pointer"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                    <span>Editar esta carta (Carátula, Datos, Tipo de juego)</span>
+                  </button>
+                )}
+
                 <button
                   onClick={handleAdd}
                   disabled={!game.inStock}
