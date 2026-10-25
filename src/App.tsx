@@ -7,12 +7,13 @@ import { GameDetailModal } from './components/GameDetailModal';
 import { CartDrawer } from './components/CartDrawer';
 import { AdminLoginModal } from './components/AdminLoginModal';
 import { GameFormModal } from './components/GameFormModal';
+import { SupabaseSettingsModal } from './components/SupabaseSettingsModal';
 import { Footer } from './components/Footer';
 import { Game } from './types/game';
-import { Search, Plus, Filter, Sparkles, Lock, ShoppingCart, RefreshCw } from 'lucide-react';
+import { Search, Plus, Filter, Sparkles, Lock, ShoppingCart, RefreshCw, Database } from 'lucide-react';
 
 const CatalogContent: React.FC = () => {
-  const { games, isAdmin, lastAddedGame, clearLastAddedGame, setIsCartOpen, cartCount, resetCatalog } = useStore();
+  const { games, isAdmin, lastAddedGame, clearLastAddedGame, setIsCartOpen, cartCount, resetCatalog, isSupabaseConnected } = useStore();
 
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,6 +25,7 @@ const CatalogContent: React.FC = () => {
   const [selectedGameForDetails, setSelectedGameForDetails] = useState<Game | null>(null);
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
   const [isGameFormOpen, setIsGameFormOpen] = useState(false);
+  const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
   const [gameToEdit, setGameToEdit] = useState<Game | null>(null);
 
   // Extract unique genres for filter dropdown
@@ -172,7 +174,21 @@ const CatalogContent: React.FC = () => {
                 Puedes agregar nuevos juegos al catálogo con imagen, descripción y precio, o modificar los existentes. Los visitantes únicamente podrán explorar y comprar por WhatsApp.
               </p>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsSupabaseModalOpen(true)}
+                className={`px-3 py-2 text-xs font-semibold rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
+                  isSupabaseConnected
+                    ? 'bg-emerald-950/60 border-emerald-600/50 text-emerald-300 hover:bg-emerald-900/60'
+                    : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md'
+                }`}
+                title="Configurar Supabase para sincronizar cartas en vivo en todos los celulares"
+              >
+                <Database className="w-3.5 h-3.5" />
+                <span>{isSupabaseConnected ? '🟢 Supabase Conectado' : '⚡ Conectar Supabase (En vivo)'}</span>
+              </button>
+
               <button
                 onClick={() => {
                   if (confirm('¿Restablecer el catálogo a los 185 juegos oficiales ($5.900 c/u)?')) {
@@ -445,6 +461,11 @@ const CatalogContent: React.FC = () => {
         isOpen={isGameFormOpen}
         onClose={() => setIsGameFormOpen(false)}
         gameToEdit={gameToEdit}
+      />
+
+      <SupabaseSettingsModal
+        isOpen={isSupabaseModalOpen}
+        onClose={() => setIsSupabaseModalOpen(false)}
       />
 
       <CartDrawer />

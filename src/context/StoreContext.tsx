@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Game, CartItem } from '../types/game';
 import { INITIAL_GAMES } from '../data/initialGames';
+import {
+  getSupabaseClient,
+  mapRowToGame,
+  mapGameToRow,
+  saveSupabaseConfig,
+} from '../lib/supabase';
 
 interface StoreContextType {
   games: Game[];
@@ -23,6 +29,10 @@ interface StoreContextType {
   cartTotal: number;
   lastAddedGame: Game | null;
   clearLastAddedGame: () => void;
+  isSupabaseConnected: boolean;
+  isSyncingToSupabase: boolean;
+  syncToSupabase: () => Promise<{ success: boolean; message: string }>;
+  saveCloudCredentials: (url: string, anonKey: string) => Promise<{ success: boolean; message: string }>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -163,6 +173,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [lastAddedGame, setLastAddedGame] = useState<Game | null>(null);
 
+  // Supabase cloud database states
+  const [isSupabaseConnected, setIsSupabaseConnected] = useState<boolean>(false);
+  const [isSyncingToSupabase, setIsSyncingToSupabase] = useState<boolean>(false);
+
   // Admin login state (hardcoded user)
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
     try {
@@ -186,7 +200,75 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
-  // Persist games safely
+  // Initialize Supabase and listen for Realtime broadcast across all devices
+  useEffect(() => {
+    const client = getSupabaseClient();
+    if (!client) {
+      setIsSupabaseConnected(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    const initSupabase = async () => {
+      try {
+        const { data, error } = await client
+          .from('games')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.warn('Supabase fetch error:', error);
+          if (isMounted) setIsSupabaseConnected(false);
+          return;
+        }
+
+        if (isMounted) {
+          setIsSupabaseConnected(true);
+          if (data && data.length > 0) {
+            setGames(data.map(mapRowToGame));
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase init failed:', err);
+        if (isMounted) setIsSupabaseConnected(false);
+      }
+    };
+
+    initSupabase();
+
+    // Live Realtime listener: Whenever any device adds, edits, or deletes a game,
+    // every other device updates immediately in under 1 second!
+    const channel = client
+      .channel('public:games')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'games' },
+        (payload) => {
+          if (!isMounted) return;
+          if (payload.eventType === 'INSERT') {
+            const newGame = mapRowToGame(payload.new);
+            setGames((prev) => [newGame, ...prev.filter((g) => g.id !== newGame.id)]);
+          } else if (payload.eventType === 'UPDATE') {
+            const updated = mapRowToGame(payload.new);
+            setGames((prev) => prev.map((g) => (g.id === updated.id ? updated : g)));
+          } else if (payload.eventType === 'DELETE') {
+            const deletedId = (payload.old as any)?.id;
+            if (deletedId) {
+              setGames((prev) => prev.filter((g) => g.id !== deletedId));
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      client.removeChannel(channel);
+    };
+  }, []);
+
+  // Persist games to local storage as fallback
   useEffect(() => {
     try {
       safeStorage.setItem(STORAGE_KEY_GAMES, JSON.stringify(games));
@@ -211,17 +293,99 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       createdAt: Date.now(),
     };
     setGames((prev) => [newGame, ...prev]);
+
+    const client = getSupabaseClient();
+    if (client) {
+      client.from('games').insert(mapGameToRow(newGame)).then(({ error }) => {
+        if (error) console.error('Error inserting to Supabase:', error);
+      });
+    }
   };
 
   const updateGame = (id: string, updatedData: Partial<Game>) => {
+    let fullUpdatedGame: Game | null = null;
     setGames((prev) =>
-      prev.map((g) => (g.id === id ? { ...g, ...updatedData } : g))
+      prev.map((g) => {
+        if (g.id === id) {
+          fullUpdatedGame = { ...g, ...updatedData };
+          return fullUpdatedGame;
+        }
+        return g;
+      })
     );
+
+    const client = getSupabaseClient();
+    if (client) {
+      const existing = games.find((g) => g.id === id);
+      const target = fullUpdatedGame || (existing ? { ...existing, ...updatedData } : null);
+      if (target) {
+        client.from('games').update(mapGameToRow(target)).eq('id', id).then(({ error }) => {
+          if (error) console.error('Error updating to Supabase:', error);
+        });
+      }
+    }
   };
 
   const deleteGame = (id: string) => {
     setGames((prev) => prev.filter((g) => g.id !== id));
     setCart((prev) => prev.filter((item) => item.game.id !== id));
+
+    const client = getSupabaseClient();
+    if (client) {
+      client.from('games').delete().eq('id', id).then(({ error }) => {
+        if (error) console.error('Error deleting from Supabase:', error);
+      });
+    }
+  };
+
+  // Upload all 185 initial games to Supabase in batches of 40
+  const syncToSupabase = async (): Promise<{ success: boolean; message: string }> => {
+    const client = getSupabaseClient();
+    if (!client) {
+      return { success: false, message: 'Supabase no está configurado.' };
+    }
+    setIsSyncingToSupabase(true);
+    try {
+      const rows = games.length > 0 ? games.map(mapGameToRow) : INITIAL_GAMES.map(mapGameToRow);
+      const BATCH_SIZE = 40;
+      for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+        const chunk = rows.slice(i, i + BATCH_SIZE);
+        const { error } = await client.from('games').upsert(chunk, { onConflict: 'id' });
+        if (error) throw error;
+      }
+      setIsSyncingToSupabase(false);
+      setIsSupabaseConnected(true);
+      return {
+        success: true,
+        message: `¡Se cargaron exitosamente ${rows.length} juegos a tu base de datos Supabase!`,
+      };
+    } catch (err: any) {
+      setIsSyncingToSupabase(false);
+      return { success: false, message: err.message || 'Error al sincronizar con Supabase' };
+    }
+  };
+
+  const saveCloudCredentials = async (url: string, anonKey: string): Promise<{ success: boolean; message: string }> => {
+    try {
+      saveSupabaseConfig(url, anonKey);
+      const client = getSupabaseClient();
+      if (!client) {
+        return { success: false, message: 'No se pudo inicializar Supabase con esas credenciales.' };
+      }
+      const { data, error } = await client.from('games').select('id').limit(1);
+      if (error) {
+        return { success: false, message: `Error al conectar: ${error.message}. Asegúrate de haber ejecutado el script SQL en Supabase.` };
+      }
+      setIsSupabaseConnected(true);
+      // If table has data, load it immediately
+      const { data: fullData } = await client.from('games').select('*').order('created_at', { ascending: false });
+      if (fullData && fullData.length > 0) {
+        setGames(fullData.map(mapRowToGame));
+      }
+      return { success: true, message: '¡Conexión exitosa con Supabase! Los cambios ahora se reflejan en tiempo real.' };
+    } catch (err: any) {
+      return { success: false, message: err.message || 'Error de conexión' };
+    }
   };
 
   const resetCatalog = () => {
@@ -318,6 +482,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         cartTotal,
         lastAddedGame,
         clearLastAddedGame,
+        isSupabaseConnected,
+        isSyncingToSupabase,
+        syncToSupabase,
+        saveCloudCredentials,
       }}
     >
       {children}

@@ -61,23 +61,6 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
-          <div className="p-2.5 rounded-lg bg-blue-950/40 border border-blue-800/40 text-xs flex items-center justify-between text-blue-300">
-            <div>
-              <span className="font-semibold block text-white">Cuenta de Administrador</span>
-              <span className="text-[11px] text-blue-300">Usuario: <strong className="text-white">yako</strong> · Contraseña: <strong className="text-white">yako</strong></span>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setUsername('yako');
-                setPassword('yako');
-              }}
-              className="px-2 py-1 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded text-[11px] font-bold shadow transition-all cursor-pointer"
-            >
-              Autocompletar
-            </button>
-          </div>
-
           <div>
             <label className="text-xs font-medium text-slate-300 block mb-1.5">
               Usuario Administrador
@@ -88,7 +71,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
               autoComplete="off"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="yako"
+              placeholder="Ingresa tu usuario"
               className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -103,7 +86,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="yako"
+              placeholder="Ingresa tu contraseña"
               className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -114,7 +97,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
               className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-semibold text-sm rounded-lg shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>Ingresar como Administrador (yako)</span>
+              <span>Ingresar como Administrador</span>
             </button>
           </div>
         </form>

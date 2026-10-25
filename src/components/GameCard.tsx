@@ -60,7 +60,7 @@ export const GameCard: React.FC<GameCardProps> = ({
         >
           <span className="text-[10px] font-black text-amber-300 uppercase tracking-wider flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-            Admin yako
+            Panel Admin
           </span>
           <div className="flex items-center gap-1.5">
             <button
