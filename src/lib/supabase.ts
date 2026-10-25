@@ -4,10 +4,14 @@ import { Game } from '../types/game';
 const STORAGE_KEY_SB_URL = 'total_game_sb_url';
 const STORAGE_KEY_SB_KEY = 'total_game_sb_key';
 
-// Read from Vercel environment variables or from admin-saved configuration
+// User's Supabase project configuration
+export const DEFAULT_SUPABASE_URL = 'https://wdwmewojzwqpicfmqesw.supabase.co';
+export const DEFAULT_SUPABASE_KEY = 'sb_publishable_gw-hg2sJJHxWCFz0k72MZA_A3EQ2Pjt';
+
+// Read from Vercel environment variables or from admin-saved configuration or default
 export const getSupabaseConfig = () => {
-  const envUrl = import.meta.env.VITE_SUPABASE_URL || '';
-  const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+  const envUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || '';
+  const envKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || '';
 
   if (envUrl && envKey) {
     return { url: envUrl.trim(), anonKey: envKey.trim() };
@@ -23,7 +27,7 @@ export const getSupabaseConfig = () => {
     }
   } catch {}
 
-  return { url: '', anonKey: '' };
+  return { url: DEFAULT_SUPABASE_URL, anonKey: DEFAULT_SUPABASE_KEY };
 };
 
 export const saveSupabaseConfig = (url: string, anonKey: string) => {
@@ -99,7 +103,7 @@ export const mapGameToRow = (game: Game | (Omit<Game, 'id' | 'createdAt'> & { id
   image_url: game.imageUrl,
   in_stock: game.inStock,
   featured: game.featured,
-  languages: game.languages,
-  release_year: game.releaseYear,
-  created_at: game.createdAt || Date.now(),
+  languages: game.languages || 'Español Latino, Inglés',
+  release_year: Math.round(Number(game.releaseYear) || 2013),
+  created_at: Math.round(Number(game.createdAt) || Date.now()),
 });

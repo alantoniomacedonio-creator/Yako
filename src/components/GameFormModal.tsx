@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { X, Upload, Image as ImageIcon, Save, Check, Plus } from 'lucide-react';
 import { Game, Platform, GameCondition } from '../types/game';
 import { useStore } from '../context/StoreContext';
+import { formatPrice } from '../utils/whatsapp';
+
 interface GameFormModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -19,7 +21,7 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
   const [platform, setPlatform] = useState<Platform>('PS5');
   const [genre, setGenre] = useState('Acción / Aventura');
   const [condition, setCondition] = useState<GameCondition>('Digital PS3');
-  const [price, setPrice] = useState<number>(5900);
+  const [price, setPrice] = useState<number | string>(5900);
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [inStock, setInStock] = useState(true);
@@ -108,12 +110,15 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
       return;
     }
 
+    const numPrice = typeof price === 'number' ? price : Number(String(price).replace(/[^\d.]/g, ''));
+    const finalPrice = !isNaN(numPrice) && numPrice >= 0 ? numPrice : 5900;
+
     const payload = {
       title: title.trim(),
       platform,
       genre,
       condition,
-      price: Number(price) || 5900,
+      price: finalPrice,
       description: description.trim() || 'Juego original para PlayStation en excelente estado.',
       imageUrl: imageUrl.trim(),
       inStock,
@@ -266,21 +271,51 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
               </div>
             </div>
 
-            {/* Price */}
-            <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">
-                Precio (ARS $) *
-              </label>
-              <input
-                type="number"
-                required
-                min={1}
-                step={100}
-                value={price}
-                onChange={(e) => setPrice(Number(e.target.value))}
-                placeholder="5900"
-                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white tabular-nums focus:outline-none focus:border-blue-500"
-              />
+            {/* Price section: Complete freedom to type any number */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-300 block">
+                  Precio (ARS $) *
+                </label>
+                <span className="text-xs font-bold text-emerald-400 font-mono">
+                  {formatPrice(Number(price) || 0)}
+                </span>
+              </div>
+
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">
+                  $
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  required
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="Escribe el precio que quieras (ej: 5900, 8500, 12000)..."
+                  className="w-full pl-8 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm font-bold text-white tabular-nums focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              {/* Quick shortcut price chips */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <span className="text-[10px] text-slate-400 mr-0.5">Sugeridos:</span>
+                {[3500, 4500, 5900, 7500, 9900, 12000, 15000].map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPrice(p)}
+                    className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                      Number(price) === p
+                        ? 'bg-emerald-600 text-white shadow-sm ring-1 ring-emerald-400'
+                        : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700'
+                    }`}
+                  >
+                    ${p.toLocaleString('es-AR')}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Description */}
