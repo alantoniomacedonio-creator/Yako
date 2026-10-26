@@ -10,6 +10,7 @@ import {
 interface StoreContextType {
   games: Game[];
   addGame: (gameData: Omit<Game, 'id' | 'createdAt'>) => void;
+  addMultipleGames: (newGames: Array<Omit<Game, 'id' | 'createdAt'> & { id?: string; createdAt?: number }>) => Promise<{ count: number }>;
   updateGame: (id: string, updatedData: Partial<Game>) => void;
   deleteGame: (id: string) => void;
   resetCatalog: () => void;
@@ -34,8 +35,8 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-// Updated version key with categorized genres (Autos, Zombies, Acción, Deportes, etc.)
-const STORAGE_KEY_GAMES = 'total_game_catalog_ps3_v13_categorized';
+// Updated version key with expanded catalog of 333 PlayStation games
+const STORAGE_KEY_GAMES = 'total_game_catalog_ps3_v14_expanded_333';
 const STORAGE_KEY_CART = 'total_game_cart_v2';
 const STORAGE_KEY_ADMIN = 'total_game_admin_auth_v1';
 
@@ -275,6 +276,45 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  const addMultipleGames = async (
+    newGamesList: Array<Omit<Game, 'id' | 'createdAt'> & { id?: string; createdAt?: number }>
+  ): Promise<{ count: number }> => {
+    const preparedGames: Game[] = newGamesList.map((g, index) => ({
+      id: g.id || `game-${Date.now()}-${index}-${Math.random().toString(36).substring(2, 6)}`,
+      createdAt: g.createdAt || (Date.now() - index * 100),
+      title: g.title?.trim() || 'Juego sin título',
+      condition: g.condition || 'Digital',
+      platform: g.platform || 'PS3',
+      genre: g.genre || 'Acción / Aventura',
+      price: Number(g.price) || 5900,
+      description: g.description?.trim() || 'Juego original para PlayStation en formato digital.',
+      imageUrl: g.imageUrl?.trim() || '',
+      inStock: g.inStock !== false,
+      featured: !!g.featured,
+      releaseYear: Number(g.releaseYear) || 2013,
+      languages: g.languages || 'Español Latino, Inglés',
+    }));
+
+    setGames((prev) => [...preparedGames, ...prev]);
+
+    // Persist immediately in batches of 40 to Supabase
+    try {
+      const client = getSupabaseClient();
+      if (client) {
+        const rows = preparedGames.map(mapGameToRow);
+        const BATCH_SIZE = 40;
+        for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+          const chunk = rows.slice(i, i + BATCH_SIZE);
+          await client.from('games').upsert(chunk, { onConflict: 'id' });
+        }
+      }
+    } catch (err) {
+      console.error('Error saving multiple games to Supabase:', err);
+    }
+
+    return { count: preparedGames.length };
+  };
+
   const updateGame = (id: string, updatedData: Partial<Game>) => {
     let fullUpdatedGame: Game | null = null;
     setGames((prev) =>
@@ -410,6 +450,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       value={{
         games,
         addGame,
+        addMultipleGames,
         updateGame,
         deleteGame,
         resetCatalog,

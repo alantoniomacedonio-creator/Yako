@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ShoppingCart, Edit3, Trash2, Eye, Gamepad2, Check } from 'lucide-react';
 import { Game } from '../types/game';
-import { formatPrice } from '../utils/whatsapp';
+import { formatPrice, formatPublicationDate } from '../utils/whatsapp';
 import { useStore } from '../context/StoreContext';
 
 interface GameCardProps {
@@ -151,11 +151,13 @@ export const GameCard: React.FC<GameCardProps> = ({
       {/* Card Content & Metadata */}
       <div className="p-2.5 sm:p-4 flex flex-col flex-1 justify-between gap-2 sm:gap-3">
         <div>
-          {/* Metadata */}
-          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-400 mb-1 truncate">
-            <span className="truncate">{game.genre}</span>
-            <span aria-hidden="true" className="text-slate-600">·</span>
-            <span className="text-blue-300 font-medium shrink-0">{game.condition}</span>
+          {/* Metadata: Género y Fecha de Publicación en la página */}
+          <div className="flex items-center justify-between text-[10px] sm:text-xs text-slate-400 mb-1">
+            <span className="truncate text-slate-300 font-medium">{game.genre}</span>
+            <span className="text-slate-400 font-semibold shrink-0 ml-1.5 text-[10px] sm:text-[11px] tabular-nums" title="Fecha de publicación en la página">
+              <span className="text-slate-500 font-normal mr-0.5">Publicado:</span>
+              <span>{formatPublicationDate(game.createdAt)}</span>
+            </span>
           </div>
 
           <h3 className="font-semibold text-white text-xs sm:text-base leading-snug line-clamp-2 group-hover:text-blue-400 transition-colors">

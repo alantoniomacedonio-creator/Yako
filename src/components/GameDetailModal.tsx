@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, ShoppingCart, MessageCircle, Check, Gamepad2, Globe, Calendar, Award, Edit3 } from 'lucide-react';
 import { Game } from '../types/game';
-import { formatPrice, generateSingleGameWhatsAppUrl } from '../utils/whatsapp';
+import { formatPrice, generateSingleGameWhatsAppUrl, formatPublicationDate } from '../utils/whatsapp';
 import { useStore } from '../context/StoreContext';
 
 interface GameDetailModalProps {
@@ -84,9 +84,6 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({ game, onClose,
                 }`}>
                   {game.platform}
                 </span>
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-900/90 text-blue-300 border border-blue-900/50">
-                  {game.condition}
-                </span>
               </div>
             </div>
 
@@ -133,7 +130,7 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({ game, onClose,
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-blue-400 shrink-0" />
-                  <span>Año: {game.releaseYear || '2023 / 2024'}</span>
+                  <span>Publicado en la página: {formatPublicationDate(game.createdAt)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Award className="w-4 h-4 text-blue-400 shrink-0" />

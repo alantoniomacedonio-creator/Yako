@@ -11,6 +11,17 @@ export function formatPrice(amount: number): string {
   }).format(amount);
 }
 
+export function formatPublicationDate(timestamp?: number): string {
+  if (!timestamp) return '26/10/2026';
+  const date = new Date(timestamp);
+  if (isNaN(date.getTime()) || timestamp < 1000000000000) return '26/10/2026';
+  return date.toLocaleDateString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+}
+
 export interface OrderCustomerInfo {
   name?: string;
   deliveryMethod?: 'Envío digital (descarga directa)' | 'Envío a domicilio' | 'Retiro en sucursal';

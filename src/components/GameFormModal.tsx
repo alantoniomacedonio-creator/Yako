@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Image as ImageIcon, Save, Check, Plus } from 'lucide-react';
 import { Game, Platform, GameCondition } from '../types/game';
 import { useStore } from '../context/StoreContext';
-import { formatPrice } from '../utils/whatsapp';
+import { formatPrice, formatPublicationDate } from '../utils/whatsapp';
 
 interface GameFormModalProps {
   isOpen: boolean;
@@ -75,7 +75,7 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
       title: title.trim(),
       platform,
       genre,
-      condition,
+      condition: 'Digital' as GameCondition,
       price: finalPrice,
       description: description.trim() || 'Juego original para PlayStation en excelente estado.',
       imageUrl: imageUrl.trim(),
@@ -162,20 +162,15 @@ export const GameFormModal: React.FC<GameFormModalProps> = ({
               </select>
             </div>
 
-            {/* Condition / Format */}
+            {/* Fecha de Publicación en la Página */}
             <div>
               <label className="text-xs font-semibold text-slate-300 block mb-1">
-                Formato / Condición
+                Fecha de Publicación en la Web
               </label>
-              <select
-                value={condition}
-                onChange={(e) => setCondition(e.target.value as GameCondition)}
-                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
-              >
-                <option value="Digital PS3">Digital PS3</option>
-                <option value="Digital">Digital</option>
-                <option value="Físico">Físico</option>
-              </select>
+              <div className="w-full px-3.5 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-sm text-slate-200 font-mono flex items-center justify-between">
+                <span>{gameToEdit ? formatPublicationDate(gameToEdit.createdAt) : 'Hoy (Automática)'}</span>
+                <span className="text-[11px] text-emerald-400 font-sans">✓ En línea</span>
+              </div>
             </div>
 
             {/* Tipo de Juego / Género: Full custom & quick buttons */}
