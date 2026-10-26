@@ -151,12 +151,11 @@ export const GameCard: React.FC<GameCardProps> = ({
       {/* Card Content & Metadata */}
       <div className="p-2.5 sm:p-4 flex flex-col flex-1 justify-between gap-2 sm:gap-3">
         <div>
-          {/* Metadata: Género y Fecha de Publicación en la página */}
-          <div className="flex items-center justify-between text-[10px] sm:text-xs text-slate-400 mb-1">
+          {/* Metadata: Género y Fecha */}
+          <div className="flex items-center justify-between text-[10px] sm:text-xs text-slate-400 mb-1 gap-2">
             <span className="truncate text-slate-300 font-medium">{game.genre}</span>
-            <span className="text-slate-400 font-semibold shrink-0 ml-1.5 text-[10px] sm:text-[11px] tabular-nums" title="Fecha de publicación en la página">
-              <span className="text-slate-500 font-normal mr-0.5">Publicado:</span>
-              <span>{formatPublicationDate(game.createdAt)}</span>
+            <span className="text-slate-400 font-medium shrink-0 text-[10px] sm:text-[11px] tabular-nums" title="Fecha de publicación">
+              {formatPublicationDate(game.createdAt)}
             </span>
           </div>
 
