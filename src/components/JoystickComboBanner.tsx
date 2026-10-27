@@ -81,6 +81,21 @@ export const JoystickComboBanner: React.FC = () => {
               <span>SUPER PROMO EXCLUSIVA PS3</span>
             </div>
 
+            {/* Promo 2 Juegos a $0 Callout */}
+            <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-950/90 to-blue-950/80 border-2 border-emerald-500/70 shadow-lg flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-black text-base shrink-0 shadow-md">
+                🎁
+              </div>
+              <div className="text-xs">
+                <span className="font-black text-emerald-300 block text-xs sm:text-sm uppercase tracking-wide">
+                  ¡INCLUYE 2 JUEGOS DE PS3 A $0 (GRATIS)!
+                </span>
+                <span className="text-slate-200 text-[11px]">
+                  Sumá este combo y elegí 2 juegos del catálogo: se bonifican al 100% de inmediato.
+                </span>
+              </div>
+            </div>
+
             <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
               Combo Joystick Inalámbrico DualShock 3 + Cable de Carga
             </h3>
@@ -124,12 +139,12 @@ export const JoystickComboBanner: React.FC = () => {
               {justAdded ? (
                 <>
                   <Check className="w-4 h-4" />
-                  <span>¡Combo Agregado al Carrito!</span>
+                  <span>¡Combo Agregado! Elegí 2 juegos a $0</span>
                 </>
               ) : (
                 <>
                   <ShoppingCart className="w-4 h-4" />
-                  <span>Agregar Combo al Carrito ({formatPrice(40000)})</span>
+                  <span>Agregar Combo + 2 Juegos a $0 ({formatPrice(40000)})</span>
                 </>
               )}
             </button>
@@ -144,6 +159,21 @@ export const JoystickComboBanner: React.FC = () => {
               <span>Pedir por WhatsApp</span>
             </a>
           </div>
+
+          {/* Floating celebratory alert when combo is added */}
+          {justAdded && (
+            <div className="fixed bottom-6 right-4 sm:right-6 z-50 p-4 rounded-2xl bg-[#0a1426] border-2 border-emerald-400 text-white shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom-5 duration-300 max-w-sm">
+              <span className="text-2xl animate-bounce">🎁</span>
+              <div className="text-xs">
+                <span className="font-extrabold text-emerald-400 block text-sm">
+                  ¡Promo Activada: 2 Juegos Gratis!
+                </span>
+                <span className="text-slate-300 leading-snug">
+                  Elegí 2 juegos de PS3 en el catálogo y te quedarán automáticamente a <strong>$0</strong>.
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
       </div>

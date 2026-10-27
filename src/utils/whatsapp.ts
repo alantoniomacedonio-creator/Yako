@@ -28,25 +28,103 @@ export interface OrderCustomerInfo {
   notes?: string;
 }
 
+export interface CartPromoSummary {
+  subtotal: number;
+  discount: number;
+  total: number;
+  joystickQuantity: number;
+  freeGamesAllowed: number;
+  freeGamesApplied: number;
+  freeGamesPending: number;
+}
+
+export function calculateCartDiscounts(items: CartItem[]): CartPromoSummary {
+  const subtotal = items.reduce((sum, item) => sum + item.game.price * item.quantity, 0);
+
+  // Count joysticks in cart
+  const joystickQuantity = items
+    .filter((item) => item.game.id === 'combo-joystick-cable-ps3' || item.game.title.toLowerCase().includes('joystick'))
+    .reduce((sum, item) => sum + item.quantity, 0);
+
+  const freeGamesAllowed = joystickQuantity * 2;
+
+  // Games eligible for gift (non-joysticks)
+  const gameItems = items.filter(
+    (item) => item.game.id !== 'combo-joystick-cable-ps3' && !item.game.title.toLowerCase().includes('joystick')
+  );
+
+  let freeGamesApplied = 0;
+  let discount = 0;
+  let remainingFree = freeGamesAllowed;
+
+  for (const item of gameItems) {
+    if (remainingFree <= 0) break;
+    const countForThis = Math.min(remainingFree, item.quantity);
+    discount += countForThis * item.game.price;
+    freeGamesApplied += countForThis;
+    remainingFree -= countForThis;
+  }
+
+  const freeGamesPending = Math.max(0, freeGamesAllowed - freeGamesApplied);
+  const total = Math.max(0, subtotal - discount);
+
+  return {
+    subtotal,
+    discount,
+    total,
+    joystickQuantity,
+    freeGamesAllowed,
+    freeGamesApplied,
+    freeGamesPending,
+  };
+}
+
 export function generateWhatsAppOrderUrl(
   items: CartItem[],
   customerInfo?: OrderCustomerInfo
 ): string {
   if (items.length === 0) return '';
 
-  const total = items.reduce((sum, item) => sum + item.game.price * item.quantity, 0);
+  const { subtotal, discount, total, freeGamesAllowed, freeGamesApplied } = calculateCartDiscounts(items);
 
   let message = `🎮 *PEDIDO TOTAL GAME - PLAYSTATION*\n\n`;
-  message += `¡Hola! Quiero comprar los siguientes juegos de PlayStation:\n\n`;
+  message += `¡Hola! Quiero confirmar mi pedido de PlayStation:\n\n`;
+
+  let remainingFreeForList = freeGamesAllowed;
 
   items.forEach((item, index) => {
-    const itemTotal = item.game.price * item.quantity;
-    message += `${index + 1}. *${item.game.title}* [${item.game.platform}]\n`;
-    message += `   • Formato: ${item.game.condition}\n`;
-    message += `   • Cantidad: ${item.quantity} x ${formatPrice(item.game.price)} = *${formatPrice(itemTotal)}*\n\n`;
+    const isJoystick = item.game.id === 'combo-joystick-cable-ps3' || item.game.title.toLowerCase().includes('joystick');
+    
+    if (isJoystick) {
+      const itemTotal = item.game.price * item.quantity;
+      message += `${index + 1}. 🎮 *${item.game.title}*\n`;
+      message += `   • Cantidad: ${item.quantity} x ${formatPrice(item.game.price)} = *${formatPrice(itemTotal)}*\n`;
+      message += `   • *¡Incluye ${item.quantity * 2} juegos de PS3 de regalo a $0!*\n\n`;
+    } else {
+      const freeForThis = Math.min(remainingFreeForList, item.quantity);
+      remainingFreeForList -= freeForThis;
+      const paidUnits = item.quantity - freeForThis;
+      const itemTotal = paidUnits * item.game.price;
+
+      if (freeForThis > 0 && paidUnits === 0) {
+        message += `${index + 1}. 🎁 *${item.game.title}* [${item.game.platform}]\n`;
+        message += `   • Cantidad: ${item.quantity} x *¡GRATIS $0!* (Regalo con Joystick)\n\n`;
+      } else if (freeForThis > 0 && paidUnits > 0) {
+        message += `${index + 1}. 🎁 *${item.game.title}* [${item.game.platform}]\n`;
+        message += `   • Cantidad: ${freeForThis} de REGALO ($0) + ${paidUnits} x ${formatPrice(item.game.price)} = *${formatPrice(itemTotal)}*\n\n`;
+      } else {
+        const fullItemTotal = item.game.price * item.quantity;
+        message += `${index + 1}. *${item.game.title}* [${item.game.platform}]\n`;
+        message += `   • Cantidad: ${item.quantity} x ${formatPrice(item.game.price)} = *${formatPrice(fullItemTotal)}*\n\n`;
+      }
+    }
   });
 
   message += `━━━━━━━━━━━━━━━━━━━━━\n`;
+  if (discount > 0) {
+    message += `💵 Subtotal: ${formatPrice(subtotal)}\n`;
+    message += `🎁 *PROMO JOYSTICK (2 Juegos a $0): -${formatPrice(discount)}*\n`;
+  }
   message += `💰 *TOTAL A PAGAR: ${formatPrice(total)}*\n`;
   message += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
 
