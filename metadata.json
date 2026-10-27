@@ -1,6 +1,6 @@
 {
   "name": "Total Game - PlayStation Store",
-  "description": "Tienda especializada en PlayStation 3: más de 330 juegos a $5.900, Combo Joystick Inalámbrico + Cable a $40k y consultas de PS4 y PS5 por WhatsApp.",
+  "description": "Tienda especializada en PlayStation 3: más de 330 juegos a $5.900, Combo Joystick Inalámbrico + Cable a $32k y consultas de PS4 y PS5 por WhatsApp.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

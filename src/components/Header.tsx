@@ -55,13 +55,13 @@ export const Header: React.FC<HeaderProps> = ({
             <span>Catálogo PS3 (+330)</span>
           </button>
 
-          {/* Promo Joysticks 40k */}
+          {/* Promo Joysticks 32k */}
           <a
             href="#combo-joystick"
             className="px-3 py-1.5 rounded-lg text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/50 hover:bg-amber-500/30 transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm"
           >
             <Zap className="w-3.5 h-3.5 text-amber-400 fill-current" />
-            <span>Combo Joysticks $40k</span>
+            <span>Combo Joysticks $32k</span>
           </a>
 
           {/* PS4 & PS5 Por Consulta */}

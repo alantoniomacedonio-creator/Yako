@@ -44,7 +44,7 @@ export const JoystickComboBanner: React.FC = () => {
             <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
               <span className="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md flex items-center gap-1">
                 <Zap className="w-3.5 h-3.5 fill-current" />
-                Combo 40k
+                Combo 32k
               </span>
               <span className="px-2 py-1 rounded-lg bg-red-600 text-white font-extrabold text-[11px] shadow">
                 PS3
@@ -59,7 +59,7 @@ export const JoystickComboBanner: React.FC = () => {
                 </span>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-xl sm:text-2xl font-black text-white tabular-nums">
-                    {formatPrice(40000)}
+                    {formatPrice(32000)}
                   </span>
                   <span className="text-xs text-slate-500 line-through tabular-nums">
                     $ 52.000
@@ -67,7 +67,7 @@ export const JoystickComboBanner: React.FC = () => {
                 </div>
               </div>
               <span className="text-[11px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-700/50 px-2 py-0.5 rounded-md">
-                Ahorrás $12.000
+                Ahorrás $20.000
               </span>
             </div>
           </div>
@@ -144,7 +144,7 @@ export const JoystickComboBanner: React.FC = () => {
               ) : (
                 <>
                   <ShoppingCart className="w-4 h-4" />
-                  <span>Agregar Combo + 2 Juegos a $0 ({formatPrice(40000)})</span>
+                  <span>Agregar Combo + 2 Juegos a $0 ({formatPrice(32000)})</span>
                 </>
               )}
             </button>

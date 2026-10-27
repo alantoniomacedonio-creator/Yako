@@ -38,7 +38,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onSelectPlatform }) => {
             </h1>
 
             <p className="text-base sm:text-lg text-slate-300 max-w-xl leading-relaxed">
-              Explorá más de 330 juegos originales de PS3 en formato digital por solo <strong>$5.900</strong> c/u. Además, llevate el <strong>Combo Joystick Inalámbrico + Cable de Carga a $40.000</strong>.
+              Explorá más de 330 juegos originales de PS3 en formato digital por solo <strong>$5.900</strong> c/u. Además, llevate el <strong>Combo Joystick Inalámbrico + Cable de Carga a $32.000</strong>.
             </p>
 
             {/* Direct Actions */}
@@ -56,7 +56,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onSelectPlatform }) => {
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm transition-all shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer"
               >
                 <Zap className="w-4 h-4 fill-current" />
-                <span>Combo Joystick + Cable $40k</span>
+                <span>Combo Joystick + Cable $32k</span>
               </a>
             </div>
 
@@ -124,7 +124,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onSelectPlatform }) => {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Joysticks + Cables $40k</span>
+                <span>Joysticks + Cables $32k</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -182,7 +182,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onSelectPlatform }) => {
                       COMBO JOYSTICK + CABLE
                     </span>
                     <span className="text-xs font-extrabold text-white bg-amber-600 px-2 py-0.5 rounded">
-                      $40.000
+                      $32.000
                     </span>
                   </div>
                   <p className="text-[11px] text-amber-100/80 leading-snug">
@@ -198,7 +198,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onSelectPlatform }) => {
                   <span className="text-[10px] text-slate-400">Juegos PS3</span>
                 </div>
                 <div className="p-2 bg-slate-950/60 rounded-lg border border-slate-800">
-                  <span className="text-base font-bold text-amber-400 block">$40k</span>
+                  <span className="text-base font-bold text-amber-400 block">$32k</span>
                   <span className="text-[10px] text-slate-400">Combo Joy</span>
                 </div>
                 <div className="p-2 bg-slate-950/60 rounded-lg border border-slate-800">

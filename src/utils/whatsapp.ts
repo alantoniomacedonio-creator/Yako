@@ -155,7 +155,7 @@ export function generatePS4PS5InquiryUrl(): string {
 }
 
 export function generateJoystickComboWhatsAppUrl(): string {
-  const message = `¡Hola Total Game! 👋 Quiero pedir el *Combo Joystick Inalámbrico PS3 + Cable de Carga* en promo por *${formatPrice(40000)}*. ¿Tienen stock disponible?`;
+  const message = `¡Hola Total Game! 👋 Quiero pedir el *Combo Joystick Inalámbrico PS3 + Cable de Carga* en promo por *${formatPrice(32000)}*. ¿Tienen stock disponible?`;
   return `https://wa.me/${WHATSAPP_PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
@@ -165,7 +165,7 @@ export const JOYSTICK_COMBO_PRODUCT = {
   platform: 'PS3' as const,
   genre: 'Accesorios / Joysticks',
   condition: 'Digital' as const,
-  price: 40000,
+  price: 32000,
   description: 'Joystick DualShock 3 inalámbrico Bluetooth (batería recargable, doble vibración y sensor de movimiento) + Cable de carga USB reforzado de alta durabilidad para PS3.',
   imageUrl: 'https://images.unsplash.com/photo-1526509867162-5b0c0d1b4b33?w=800&auto=format&fit=crop&q=80',
   inStock: true,
