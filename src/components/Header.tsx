@@ -1,6 +1,7 @@
 import React from 'react';
-import { ShoppingCart, ShieldCheck, Lock, Gamepad2, Plus, LogOut } from 'lucide-react';
+import { ShoppingCart, ShieldCheck, Lock, Gamepad2, Plus, LogOut, MessageCircle, Zap } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
+import { generatePS4PS5InquiryUrl } from '../utils/whatsapp';
 
 interface HeaderProps {
   onOpenAdminLogin: () => void;
@@ -24,72 +25,62 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Brand Logo & Name */}
         <a 
           href="#catalogo" 
-          className="flex items-center gap-2 text-lg sm:text-xl font-bold tracking-tight text-white whitespace-nowrap shrink-0 group"
+          className="flex items-center gap-2.5 text-lg sm:text-xl font-bold tracking-tight text-white whitespace-nowrap shrink-0 group"
         >
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-600/30 group-hover:bg-blue-500 transition-colors">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-red-600 flex items-center justify-center text-white shadow-md shadow-red-600/30 group-hover:bg-red-500 transition-colors">
             <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <span className="font-display text-lg sm:text-2xl font-black tracking-wider uppercase text-white">
-            Total <span className="text-blue-500">Game</span>
-          </span>
+          <div className="flex flex-col leading-none">
+            <span className="font-display text-lg sm:text-2xl font-black tracking-wider uppercase text-white">
+              Total <span className="text-red-500">Game</span>
+            </span>
+            <span className="text-[10px] text-red-400 font-semibold tracking-wider uppercase">
+              Especialistas PS3
+            </span>
+          </div>
         </a>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-4 lg:gap-5 text-sm font-medium text-slate-300">
-          <button
-            onClick={() => onSelectPlatform('TODOS')}
-            className={`transition-colors whitespace-nowrap shrink-0 hover:text-white cursor-pointer ${
-              selectedPlatform === 'TODOS' ? 'text-blue-400 font-bold' : 'text-slate-300'
-            }`}
-          >
-            Todos los Juegos
-          </button>
-          
-          {/* PS5 */}
-          <button
-            onClick={() => onSelectPlatform('PS5')}
-            className={`px-3 py-1 rounded-lg text-xs font-black transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer ${
-              selectedPlatform === 'PS5'
-                ? 'bg-sky-500 text-slate-950 ring-2 ring-sky-300 shadow-md shadow-sky-500/30'
-                : 'bg-sky-950/60 text-sky-300 border border-sky-800/60 hover:bg-sky-900/60'
-            }`}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
-            <span>PS5</span>
-          </button>
-
-          {/* PS4 */}
-          <button
-            onClick={() => onSelectPlatform('PS4')}
-            className={`px-3 py-1 rounded-lg text-xs font-black transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer ${
-              selectedPlatform === 'PS4'
-                ? 'bg-blue-600 text-white ring-2 ring-blue-300 shadow-md shadow-blue-600/30'
-                : 'bg-blue-950/60 text-blue-300 border border-blue-800/60 hover:bg-blue-900/60'
-            }`}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-            <span>PS4</span>
-          </button>
-
-          {/* PS3 */}
+        <nav className="hidden md:flex items-center gap-3 lg:gap-4 text-sm font-medium text-slate-300">
+          {/* PS3 Catálogo Activo */}
           <button
             onClick={() => onSelectPlatform('PS3')}
-            className={`px-3 py-1 rounded-lg text-xs font-black transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer ${
-              selectedPlatform === 'PS3'
-                ? 'bg-red-600 text-white ring-2 ring-red-300 shadow-md shadow-red-600/30'
+            className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer ${
+              selectedPlatform === 'PS3' || selectedPlatform === 'TODOS'
+                ? 'bg-red-600 text-white ring-2 ring-red-300 shadow-md shadow-red-600/40'
                 : 'bg-red-950/60 text-red-300 border border-red-800/60 hover:bg-red-900/60'
             }`}
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
-            <span>PS3</span>
+            <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
+            <span>Catálogo PS3 (+330)</span>
           </button>
 
-          {/* Circled Contact Button */}
+          {/* Promo Joysticks 40k */}
+          <a
+            href="#combo-joystick"
+            className="px-3 py-1.5 rounded-lg text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/50 hover:bg-amber-500/30 transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm"
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-400 fill-current" />
+            <span>Combo Joysticks $40k</span>
+          </a>
+
+          {/* PS4 & PS5 Por Consulta */}
+          <a
+            href={generatePS4PS5InquiryUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-sky-300 border border-slate-700 hover:border-emerald-500/60 hover:text-emerald-300 transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer"
+            title="Consultar catálogo de PS4 y PS5 por WhatsApp"
+          >
+            <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+            <span>PS4 & PS5 (Por Consulta)</span>
+          </a>
+
+          {/* Contact Button */}
           <a
             href="#contacto"
-            className="transition-all whitespace-nowrap shrink-0 px-3.5 py-1.5 rounded-full border border-emerald-500/40 bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-300 font-semibold text-xs flex items-center gap-1.5 shadow-sm shadow-emerald-950/40 ring-2 ring-emerald-500/20 active:scale-95"
+            className="transition-all whitespace-nowrap shrink-0 px-3 py-1.5 rounded-full border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white font-semibold text-xs flex items-center gap-1.5"
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
             <span>Contacto</span>
           </a>
         </nav>

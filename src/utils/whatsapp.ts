@@ -70,3 +70,28 @@ export function generateSingleGameWhatsAppUrl(gameTitle: string, gamePrice: numb
   const message = `¡Hola Total Game! 👋 Me interesa comprar *${gameTitle}* (${platform}) a ${formatPrice(gamePrice)}. ¿Tienen stock disponible?`;
   return `https://wa.me/${WHATSAPP_PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
 }
+
+export function generatePS4PS5InquiryUrl(): string {
+  const message = `¡Hola Total Game! 👋 Quiero consultar catálogo, disponibilidad y precios de juegos para PlayStation 4 y PlayStation 5. ¿Me podrían pasar info?`;
+  return `https://wa.me/${WHATSAPP_PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
+export function generateJoystickComboWhatsAppUrl(): string {
+  const message = `¡Hola Total Game! 👋 Quiero pedir el *Combo Joystick Inalámbrico PS3 + Cable de Carga* en promo por *${formatPrice(40000)}*. ¿Tienen stock disponible?`;
+  return `https://wa.me/${WHATSAPP_PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
+export const JOYSTICK_COMBO_PRODUCT = {
+  id: 'combo-joystick-cable-ps3',
+  title: 'Combo Joystick Inalámbrico PS3 + Cable de Carga',
+  platform: 'PS3' as const,
+  genre: 'Accesorios / Joysticks',
+  condition: 'Digital' as const,
+  price: 40000,
+  description: 'Joystick DualShock 3 inalámbrico Bluetooth (batería recargable, doble vibración y sensor de movimiento) + Cable de carga USB reforzado de alta durabilidad para PS3.',
+  imageUrl: 'https://images.unsplash.com/photo-1526509867162-5b0c0d1b4b33?w=800&auto=format&fit=crop&q=80',
+  inStock: true,
+  featured: true,
+  releaseYear: 2026,
+  createdAt: Date.now(),
+};

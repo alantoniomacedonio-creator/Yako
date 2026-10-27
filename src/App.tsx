@@ -7,9 +7,11 @@ import { GameDetailModal } from './components/GameDetailModal';
 import { CartDrawer } from './components/CartDrawer';
 import { AdminLoginModal } from './components/AdminLoginModal';
 import { GameFormModal } from './components/GameFormModal';
+import { JoystickComboBanner } from './components/JoystickComboBanner';
 import { Footer } from './components/Footer';
 import { Game } from './types/game';
-import { Search, Plus, Filter, Sparkles, Lock, ShoppingCart, RefreshCw, Save, Check, ShieldAlert } from 'lucide-react';
+import { Search, Plus, Filter, Sparkles, Lock, ShoppingCart, RefreshCw, Save, Check, ShieldAlert, MessageCircle, Zap } from 'lucide-react';
+import { generatePS4PS5InquiryUrl } from './utils/whatsapp';
 
 const CatalogContent: React.FC = () => {
   const {
@@ -38,7 +40,7 @@ const CatalogContent: React.FC = () => {
 
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState('');
-  const [platformFilter, setPlatformFilter] = useState<string>('TODOS');
+  const [platformFilter, setPlatformFilter] = useState<string>('PS3');
   const [genreFilter, setGenreFilter] = useState<string>('TODOS');
   const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'name-asc'>('featured');
 
@@ -232,15 +234,20 @@ const CatalogContent: React.FC = () => {
           </div>
         )}
 
+        {/* Promoción Destacada: Combo Joystick Inalámbrico + Cable de Carga PS3 ($40.000) */}
+        <div id="combo-joystick">
+          <JoystickComboBanner />
+        </div>
+
         {/* Section Heading & Filter Controls */}
         <div className="space-y-6 mb-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <span className="text-xs font-bold text-blue-400 tracking-wider uppercase block mb-1">
-                Juegos Originales
+              <span className="text-xs font-bold text-red-400 tracking-wider uppercase block mb-1">
+                Especialistas en PlayStation 3
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                Catálogo PlayStation
+                Catálogo PlayStation 3
               </h2>
             </div>
             <div className="flex items-center gap-3">
@@ -270,8 +277,8 @@ const CatalogContent: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Buscar por nombre, saga o género (ej: Spider-Man, Terror)..."
-                className="w-full pl-10 pr-4 py-2.5 bg-[#0b1222] border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+                placeholder="Buscar por nombre, saga o género (ej: GTA, Resident Evil, Terror)..."
+                className="w-full pl-10 pr-4 py-2.5 bg-[#0b1222] border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500 transition-colors"
               />
               {searchQuery && (
                 <button
@@ -283,8 +290,23 @@ const CatalogContent: React.FC = () => {
               )}
             </div>
 
-            {/* Prominently Highlighted Platform Filter Buttons: PS5, PS4, PS3 */}
+            {/* PlayStation Platform Filter Buttons: PS3 Primary + PS4/5 by Consultation */}
             <div className="flex items-center gap-1.5 p-1 bg-[#0b1222] border border-slate-800 rounded-xl self-start sm:self-auto overflow-x-auto max-w-full">
+              {/* PS3 Primary */}
+              <button
+                type="button"
+                onClick={() => setPlatformFilter('PS3')}
+                className={`px-3.5 py-1.5 text-xs font-black rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
+                  platformFilter === 'PS3'
+                    ? 'bg-red-600 text-white shadow-md shadow-red-600/30 ring-2 ring-red-400'
+                    : 'bg-red-950/60 text-red-300 hover:bg-red-900/60 border border-red-800/50'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
+                <span>PS3 (Catálogo Activo)</span>
+              </button>
+
+              {/* Todos */}
               <button
                 type="button"
                 onClick={() => setPlatformFilter('TODOS')}
@@ -294,50 +316,20 @@ const CatalogContent: React.FC = () => {
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Todos
+                Todos (+330)
               </button>
 
-              {/* PS5 */}
-              <button
-                type="button"
-                onClick={() => setPlatformFilter('PS5')}
-                className={`px-3.5 py-1.5 text-xs font-black rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
-                  platformFilter === 'PS5'
-                    ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30 ring-2 ring-sky-300'
-                    : 'bg-sky-950/60 text-sky-400 hover:bg-sky-900/60 border border-sky-800/50'
-                }`}
+              {/* PS4 & PS5 Por Consulta */}
+              <a
+                href={generatePS4PS5InquiryUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 bg-slate-900 text-sky-300 hover:text-emerald-300 hover:bg-slate-800 border border-slate-700 cursor-pointer"
+                title="Consultar por catálogo y juegos de PS4 y PS5 por WhatsApp"
               >
-                <span className="w-2 h-2 rounded-full bg-sky-400"></span>
-                <span>PS5</span>
-              </button>
-
-              {/* PS4 */}
-              <button
-                type="button"
-                onClick={() => setPlatformFilter('PS4')}
-                className={`px-3.5 py-1.5 text-xs font-black rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
-                  platformFilter === 'PS4'
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 ring-2 ring-blue-400'
-                    : 'bg-blue-950/60 text-blue-400 hover:bg-blue-900/60 border border-blue-800/50'
-                }`}
-              >
-                <span className="w-2 h-2 rounded-full bg-blue-400"></span>
-                <span>PS4</span>
-              </button>
-
-              {/* PS3 */}
-              <button
-                type="button"
-                onClick={() => setPlatformFilter('PS3')}
-                className={`px-3.5 py-1.5 text-xs font-black rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
-                  platformFilter === 'PS3'
-                    ? 'bg-red-600 text-white shadow-md shadow-red-600/30 ring-2 ring-red-400'
-                    : 'bg-red-950/60 text-red-400 hover:bg-red-900/60 border border-red-800/50'
-                }`}
-              >
-                <span className="w-2 h-2 rounded-full bg-red-400"></span>
-                <span>PS3</span>
-              </button>
+                <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                <span>PS4 & PS5 (Por Consulta ↗)</span>
+              </a>
             </div>
 
             {/* Genre Select */}
