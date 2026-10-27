@@ -1,0 +1,55 @@
+# ==========================================
+# robots.txt para Total Game
+# Permite el rastreo e indexación completa
+# para Inteligencias Artificiales y buscadores
+# ==========================================
+
+# 1. Regla general para todos los robots de la web
+User-agent: *
+Allow: /
+Crawl-delay: 1
+
+# 2. OpenAI / ChatGPT (Para que ChatGPT pueda navegar tu página y responder consultas)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+# 3. Google AI & Buscador (Gemini, Google-Extended, Googlebot)
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+# 4. Anthropic / Claude
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+# 5. Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+
+# 6. Meta / Facebook AI
+User-agent: FacebookBot
+Allow: /
+
+# 7. Apple AI
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# 8. Sitemap
+Sitemap: https://ais-pre-n3aygydahl6urvcvbjjnqj-316206129812.us-east1.run.app/sitemap.xml
