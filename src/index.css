@@ -19,8 +19,29 @@
 }
 ::-webkit-scrollbar-thumb {
   background: #1e293b;
-  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #0284c7;
+}
+
+/* Protección anti-descarga y anti-copia de imágenes */
+img, 
+picture, 
+.no-download {
+  -webkit-user-drag: none !important;
+  -khtml-user-drag: none !important;
+  -moz-user-drag: none !important;
+  -o-user-drag: none !important;
+  user-drag: none !important;
+  -webkit-touch-callout: none !important; /* Desactiva el menú contextual de guardar imagen en celulares (iOS y Android) */
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  pointer-events: none !important; /* Evita que el clic derecho reconozca la etiqueta <img> */
+}
+
+/* Permitir que los botones, enlaces y contenedores interactivos sigan funcionando */
+button, a, input, select, textarea, [role="button"], article {
+  pointer-events: auto !important;
 }

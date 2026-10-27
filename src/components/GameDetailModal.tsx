@@ -42,14 +42,25 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({ game, onClose,
         <div className="overflow-y-auto p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
             
-            {/* Cover Column */}
-            <div className="md:col-span-5 relative aspect-[3/4] rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shadow-md">
+            {/* Cover Column with anti-download protection */}
+            <div 
+              onContextMenu={(e) => e.preventDefault()}
+              className="md:col-span-5 relative aspect-[3/4] rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shadow-md select-none"
+            >
+              {/* Anti-download transparent shield */}
+              <div 
+                className="absolute inset-0 z-10 pointer-events-none select-none" 
+                onContextMenu={(e) => e.preventDefault()} 
+              />
+
               {game.imageUrl && !imgError ? (
                 <img
                   src={game.imageUrl}
                   alt={game.title}
                   onError={() => setImgError(true)}
-                  className="w-full h-full object-cover"
+                  draggable={false}
+                  onContextMenu={(e) => e.preventDefault()}
+                  className="w-full h-full object-cover pointer-events-none select-none no-download"
                   referrerPolicy="no-referrer"
                 />
               ) : (

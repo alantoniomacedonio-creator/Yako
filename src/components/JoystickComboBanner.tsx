@@ -23,13 +23,22 @@ export const JoystickComboBanner: React.FC = () => {
         
         {/* Left: Product Image & Badges */}
         <div className="lg:col-span-5 relative group">
-          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-amber-500/30 bg-slate-950 shadow-xl">
+          <div 
+            onContextMenu={(e) => e.preventDefault()}
+            className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-amber-500/30 bg-slate-950 shadow-xl select-none"
+          >
+            <div 
+              className="absolute inset-0 z-10 pointer-events-none select-none" 
+              onContextMenu={(e) => e.preventDefault()} 
+            />
             <img
               src={JOYSTICK_COMBO_PRODUCT.imageUrl}
               alt="Combo Joystick PS3 y Cable de Carga"
-              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+              draggable={false}
+              onContextMenu={(e) => e.preventDefault()}
+              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 pointer-events-none select-none no-download"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none" />
             
             {/* Top Badges */}
             <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">

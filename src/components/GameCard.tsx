@@ -85,13 +85,24 @@ export const GameCard: React.FC<GameCardProps> = ({
       )}
 
       {/* Image Area: 65-75% visual weight */}
-      <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-900">
+      <div 
+        onContextMenu={(e) => e.preventDefault()}
+        className="relative aspect-[3/4] w-full overflow-hidden bg-slate-900 select-none"
+      >
+        {/* Anti-download transparent shield */}
+        <div 
+          className="absolute inset-0 z-10 pointer-events-none select-none" 
+          onContextMenu={(e) => e.preventDefault()} 
+        />
+
         {!imageError && game.imageUrl ? (
           <img
             src={game.imageUrl}
             alt={game.title}
             onError={() => setImageError(true)}
-            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+            draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 pointer-events-none select-none no-download"
             referrerPolicy="no-referrer"
             loading="lazy"
           />
